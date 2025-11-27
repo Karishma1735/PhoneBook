@@ -64,7 +64,7 @@ function Navbar({searchuser,filterByLabel}) {
       >
         <MenuItem value="">All</MenuItem>
         <MenuItem value="Family">Family</MenuItem>
-        <MenuItem value="Friends">Friends</MenuItem>
+        <MenuItem value="Friend">Friend</MenuItem>
         <MenuItem value="Work">Work</MenuItem>
       </Select>
           <Button
