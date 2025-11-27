@@ -1,4 +1,4 @@
-import { ADD_CONTACT, DELETE_CONTACT, EDIT_CONTACT, UPDATE_CONTACT } from "./actionTypes";
+import { ADD_CONTACT, DELETE_CONTACT, EDIT_CONTACT, SEARCH_USER, TOGGLE_BOOKMARK, UPDATE_CONTACT } from "./actionTypes";
 
 export const addcontacts = (contact)=>({
     type:ADD_CONTACT,
@@ -18,4 +18,13 @@ export const editcontact = (contact)=>({
 export const updateContact = (contact)=>({
     type:UPDATE_CONTACT,
     payload:contact
+})
+
+export const toggleBookmark = (id)=>({
+    type:TOGGLE_BOOKMARK,
+    payload:id,
+})
+export const searchuser =(text)=>({
+    type:SEARCH_USER,
+    payload:text,
 })

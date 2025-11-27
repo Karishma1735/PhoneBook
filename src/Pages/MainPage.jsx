@@ -1,9 +1,6 @@
-import { Typography } from '@mui/material'
-import React from 'react'
-import ContactForm from '../components/ContactForm'
 import Navbar from '../components/Navbar'
-import ContactItem from '../components/ContactItem'
 import ContactList from '../components/ContactList'
+import { useState } from 'react'
 
 function MainPage() {
   return (

@@ -2,7 +2,7 @@ import { Box, TextField, Select, MenuItem, Button } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { addcontacts, updateContact } from '../redux/actions';
 import { connect } from 'react-redux';
-function ContactForm({ addcontacts ,editingcontact,updateContact}) {
+function ContactForm({ addcontacts ,editingcontact,updateContact,handleClose}) {
   const [form, setForm] = useState({
     name: "",
     contact: "",
@@ -39,7 +39,9 @@ function ContactForm({ addcontacts ,editingcontact,updateContact}) {
     }
    reader.readAsDataURL(file)
   }
-  const handleSubmit = () => {
+  const handleSubmit = (e) => {
+    e.preventDefault()
+    console.log("Prevent default worked")
     if (editingcontact) {
       updateContact({
         id: editingcontact.id,
@@ -50,8 +52,10 @@ function ContactForm({ addcontacts ,editingcontact,updateContact}) {
         id: Date.now(),
         ...form
       });
+      handleClose()
     }
     setForm({ name: "", contact: "",address:"",label:"" });
+
   };
   return (
     <Box sx={{ display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center",marginTop:5 }}>

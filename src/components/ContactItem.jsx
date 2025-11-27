@@ -1,9 +1,12 @@
 import React, { useState } from 'react'
 import { Typography, Box, Button, Modal, TextField, Select, MenuItem, Avatar } from '@mui/material'
 import { connect } from 'react-redux'
-import { deleteContact, updateContact } from '../redux/actions'
+import { deleteContact, toggleBookmark, updateContact } from '../redux/actions'
+import BookmarkIcon from '@mui/icons-material/Bookmark';
 
-function ContactItem({ contact, deleteContact, updateContact }) {
+
+
+function ContactItem({ contact, deleteContact, updateContact,toggleBookmark }) {
   console.log("contact", contact)
   const [open, setOpen] = useState(false);
   const [editForm, setEditForm] = useState({
@@ -19,6 +22,9 @@ function ContactItem({ contact, deleteContact, updateContact }) {
     updateContact({ ...editForm, id: contact.id });
     setOpen(false);
   };
+  const handleBookmark = ()=>{
+    toggleBookmark(contact.id)
+  }
   const handleOPen = ()=>setOpen(true)
   return (
     <Box sx={{ display: "flex", justifyContent: "space-around", boxShadow: 1, margin: 2, padding: 3, fontFamily: "sans-serif", fontSize: "20px" }}>
@@ -42,6 +48,17 @@ function ContactItem({ contact, deleteContact, updateContact }) {
         >
           Delete
         </Button>
+         <Button
+          onClick={handleBookmark}
+        >
+          <BookmarkIcon   
+
+          color={contact.bookmarked ? "secondary" : "primary"}
+         />
+        
+        </Button>
+        
+      
       </Box>
       <Modal
         open={open}
@@ -82,7 +99,7 @@ function ContactItem({ contact, deleteContact, updateContact }) {
             fullWidth
             label="Address"
             name="address"
-            value={editForm.address}
+            value={editForm.address}  
             onChange={handleChange}
             sx={{ mb: 2 }}
           />
@@ -93,9 +110,9 @@ function ContactItem({ contact, deleteContact, updateContact }) {
             onChange={handleChange}
             sx={{ mb: 2 }}
           >
-            <MenuItem value="Home">Work</MenuItem>
-            <MenuItem value="Work">Friend</MenuItem>
-            <MenuItem value="Other">Family</MenuItem>
+            <MenuItem value="Work">Work</MenuItem>
+            <MenuItem value="Friend">Friend</MenuItem>
+            <MenuItem value="Family">Family</MenuItem>
           </Select>
           <Button variant="contained" fullWidth onClick={handleSave}>
             Update Contact
@@ -108,7 +125,8 @@ function ContactItem({ contact, deleteContact, updateContact }) {
 
 const mapDispatchToProps = {
   deleteContact,
-  updateContact
+  updateContact,
+  toggleBookmark
 }
 export default connect(null, mapDispatchToProps)(ContactItem)
 

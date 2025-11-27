@@ -6,8 +6,14 @@ import {
   Button,
   Modal,
   Box,
+  TextField,
+  InputAdornment,
+  IconButton
 } from "@mui/material";
+  import SearchIcon from '@mui/icons-material/Search';
 import ContactForm from "../components/ContactForm";
+import { searchuser } from "../redux/actions";
+import { connect } from "react-redux";
 const style = {
   position: "absolute",
   top: "50%",
@@ -19,7 +25,7 @@ const style = {
   p: 4,
   borderRadius: "10px",
 };
-function Navbar() {
+function Navbar(searchuser) {
   const [open, setOpen] = useState(false);
   return (
     <>
@@ -28,6 +34,27 @@ function Navbar() {
           sx={{ display: "flex", justifyContent: "space-between", px: 2 }}
         >
           <Typography variant="h6">Phonebook</Typography>
+            <TextField
+             label="Search"
+            //  value={search}
+             onChange={(e)=>searchuser(e.target.value)}
+            InputProps={{
+            endAdornment: (
+              <InputAdornment position="end">
+                <IconButton aria-label="search">
+                  <SearchIcon />
+                </IconButton>
+              </InputAdornment>
+            ),
+          }}
+            sx={{
+              overflow:"hidden",
+              bgcolor:"white",
+              outline:"none"
+              
+            }}
+            />
+
           <Button
             variant="contained"
             color="secondary"
@@ -45,7 +72,10 @@ function Navbar() {
     </>
   );
 }
-export default Navbar;
+const mapDispatchToProps = {
+  searchuser
+}
+export default connect(null,mapDispatchToProps)(Navbar);
 
 
 
