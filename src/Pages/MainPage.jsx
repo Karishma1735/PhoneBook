@@ -9,7 +9,6 @@ function MainPage() {
   return (
     <div>
         <Navbar/>
-        <ContactForm/>
         <ContactList/>
         
         </div>

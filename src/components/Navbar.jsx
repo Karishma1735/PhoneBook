@@ -1,30 +1,55 @@
-import AppBar from '@mui/material/AppBar';
-import Box from '@mui/material/Box';
-import Toolbar from '@mui/material/Toolbar';
-import Typography from '@mui/material/Typography';
-import Button from '@mui/material/Button';
-import IconButton from '@mui/material/IconButton';
-
-export default function Navbar() {
+import React, { useState } from "react";
+import {
+  AppBar,
+  Toolbar,
+  Typography,
+  Button,
+  Modal,
+  Box,
+} from "@mui/material";
+import ContactForm from "../components/ContactForm";
+const style = {
+  position: "absolute",
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)",
+  width: 400,
+  bgcolor: "background.paper",
+  boxShadow: 24,
+  p: 4,
+  borderRadius: "10px",
+};
+function Navbar() {
+  const [open, setOpen] = useState(false);
   return (
-    <Box sx={{ flexGrow: 1 }}>
+    <>
       <AppBar position="static">
-        <Toolbar>
-          <IconButton
-            size="large"
-            edge="start"
-            color="inherit"
-            aria-label="menu"
-            sx={{ mr: 2 }}
+        <Toolbar
+          sx={{ display: "flex", justifyContent: "space-between", px: 2 }}
+        >
+          <Typography variant="h6">Phonebook</Typography>
+          <Button
+            variant="contained"
+            color="secondary"
+            onClick={() => setOpen(true)}
+            sx={{ textTransform: "none" }}
           >
-
-          </IconButton>
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-           PhoneBook
-          </Typography>
-          <Button color="inherit">Login</Button>
+          Create Contact
+          </Button>
         </Toolbar>
       </AppBar>
-    </Box>
+      <Modal open={open} onClose={() => setOpen(false)}>
+        <Box sx={style}>
+          <ContactForm handleClose={() => setOpen(false)} />
+        </Box>
+      </Modal>
+    </>
   );
 }
+export default Navbar;
+
+
+
+
+
+
