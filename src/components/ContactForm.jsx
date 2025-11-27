@@ -17,7 +17,8 @@ function ContactForm({ addcontacts ,editingcontact,updateContact}) {
         name: editingcontact.name,
         contact: editingcontact.contact,
         address:editingcontact.address,
-        label:editingcontact.label
+        label:editingcontact.label,
+        image:editingcontact.image||"",
       });
     }
   }, [editingcontact]);
@@ -28,6 +29,16 @@ function ContactForm({ addcontacts ,editingcontact,updateContact}) {
       [e.target.name]: e.target.value,
     });
   };
+
+  const handleImageUpload =(e)=>{
+    const file = e.target.files[0]
+    const reader = new FileReader()
+ 
+    reader.onloadend=()=>{
+        setForm({...form,image:reader.result})
+    }
+   reader.readAsDataURL(file)
+  }
   const handleSubmit = () => {
     if (editingcontact) {
       updateContact({
@@ -43,7 +54,7 @@ function ContactForm({ addcontacts ,editingcontact,updateContact}) {
     setForm({ name: "", contact: "",address:"",label:"" });
   };
   return (
-    <Box sx={{ display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center",marginTop:5 }}>
+    <Box sx={{ display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center",marginTop:5 }}>
       <TextField
         name="name"
         label="Name"
@@ -84,6 +95,12 @@ function ContactForm({ addcontacts ,editingcontact,updateContact}) {
         <MenuItem value="Friend">Friend</MenuItem>
         <MenuItem value="Family">Family</MenuItem>
       </Select>
+        <input
+        type="file"
+        accept="image/*"
+        onChange={handleImageUpload}
+        style={{ margin: '10px' }}
+      />
       <Button onClick={handleSubmit}>{editingcontact?"Update Contact":"Add contact"}</Button>
     </Box>
   );

@@ -32,7 +32,6 @@ function Navbar() {
             variant="contained"
             color="secondary"
             onClick={() => setOpen(true)}
-            sx={{ textTransform: "none" }}
           >
           Create Contact
           </Button>
