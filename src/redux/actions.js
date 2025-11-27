@@ -1,4 +1,4 @@
-import { ADD_CONTACT, DELETE_CONTACT, EDIT_CONTACT, SEARCH_USER, TOGGLE_BOOKMARK, UPDATE_CONTACT } from "./actionTypes";
+import { ADD_CONTACT, DELETE_CONTACT, EDIT_CONTACT, FILTER_LABEL, SEARCH_USER, TOGGLE_BOOKMARK, UPDATE_CONTACT } from "./actionTypes";
 
 export const addcontacts = (contact)=>({
     type:ADD_CONTACT,
@@ -28,3 +28,8 @@ export const searchuser =(text)=>({
     type:SEARCH_USER,
     payload:text,
 })
+export const filterByLabel = (label) => ({
+    type: FILTER_LABEL,
+    payload: label
+});
+

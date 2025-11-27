@@ -1,10 +1,11 @@
 import { editcontact } from "./actions";
-import { ADD_CONTACT, DELETE_CONTACT, EDIT_CONTACT, SEARCH_USER, TOGGLE_BOOKMARK, UPDATE_CONTACT } from "./actionTypes";
+import { ADD_CONTACT, DELETE_CONTACT, EDIT_CONTACT, FILTER_LABEL, SEARCH_USER, TOGGLE_BOOKMARK, UPDATE_CONTACT } from "./actionTypes";
 
 const initialState = {
     contacts:[],
     editingcontact:null,
-    search:""
+    search:"",
+    filtering:"",
 }
 
 export const phoneBookReducer = (state=initialState,action)=>{
@@ -14,7 +15,6 @@ export const phoneBookReducer = (state=initialState,action)=>{
             const exists = state.contacts.find(c=>c.contact===action.payload.contact)
             if(exists){
                alert("Contact already exists")
-                // return state;    
             }else{
             return {
                 ...state, 
@@ -41,11 +41,18 @@ export const phoneBookReducer = (state=initialState,action)=>{
               
             }
                 case SEARCH_USER:
-                console.log("search users");
-                
+                console.log("search users triggered");
+              
                 return{
+                      ...state,
                     search:action.payload
                 }
+                case FILTER_LABEL:
+            console.log("filtering contacts by label");
+            return {
+                ...state,
+                filtering: action.payload,
+            };
             case TOGGLE_BOOKMARK:
                 console.log("bookmark added")
             return {

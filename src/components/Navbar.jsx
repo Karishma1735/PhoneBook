@@ -8,11 +8,14 @@ import {
   Box,
   TextField,
   InputAdornment,
-  IconButton
+  IconButton,
+  InputLabel,
+  Select,
+  MenuItem
 } from "@mui/material";
   import SearchIcon from '@mui/icons-material/Search';
 import ContactForm from "../components/ContactForm";
-import { searchuser } from "../redux/actions";
+import { filterByLabel, searchuser } from "../redux/actions";
 import { connect } from "react-redux";
 const style = {
   position: "absolute",
@@ -25,7 +28,7 @@ const style = {
   p: 4,
   borderRadius: "10px",
 };
-function Navbar(searchuser) {
+function Navbar({searchuser,filterByLabel}) {
   const [open, setOpen] = useState(false);
   return (
     <>
@@ -36,7 +39,6 @@ function Navbar(searchuser) {
           <Typography variant="h6">Phonebook</Typography>
             <TextField
              label="Search"
-            //  value={search}
              onChange={(e)=>searchuser(e.target.value)}
             InputProps={{
             endAdornment: (
@@ -54,7 +56,17 @@ function Navbar(searchuser) {
               
             }}
             />
-
+      <Select
+        label="Label"
+        onChange={(e) => filterByLabel(e.target.value)}
+        defaultValue=""
+        color="white"
+      >
+        <MenuItem value="">All</MenuItem>
+        <MenuItem value="Family">Family</MenuItem>
+        <MenuItem value="Friends">Friends</MenuItem>
+        <MenuItem value="Work">Work</MenuItem>
+      </Select>
           <Button
             variant="contained"
             color="secondary"
@@ -73,7 +85,8 @@ function Navbar(searchuser) {
   );
 }
 const mapDispatchToProps = {
-  searchuser
+  searchuser,
+  filterByLabel
 }
 export default connect(null,mapDispatchToProps)(Navbar);
 
