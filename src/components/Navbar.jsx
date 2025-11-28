@@ -27,6 +27,7 @@ const style = {
   boxShadow: 24,
   p: 4,
   borderRadius: "10px",
+  overflow:"hidden"
 };
 function Navbar({searchuser,filterByLabel}) {
   const [open, setOpen] = useState(false);
@@ -58,13 +59,22 @@ function Navbar({searchuser,filterByLabel}) {
             />
       <Select
   label="Label"
+    value=""
+  displayEmpty 
+  renderValue={(selected) => {
+    if (selected === "") return "All";
+    return selected;
+  }}
   onChange={(e) => filterByLabel(e.target.value)}
   color="white"
   sx={{
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#ffff',
     borderRadius: '8px',
     fontSize: '16px',
-    width:"80px"
+    width:"80px",
+    height:"50px",
+    overflow:"hidden",
+    padding:0 
   }}
 >
   <MenuItem value="">All</MenuItem>

@@ -1,14 +1,15 @@
 import { Box, TextField, Select, MenuItem, Button, Typography } from '@mui/material';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { addcontacts, updateContact } from '../redux/actions';
 import { connect } from 'react-redux';
 import axios from 'axios';
+import {baseUrl} from "../../config"
 
 function ContactForm({ addcontacts ,editingcontact, updateContact, handleClose }) {
   const [form, setForm] = useState({
     name: "",
     contact: "",
-    address: "",
+    adress: "",
     label: "",
     image:"",
   });
@@ -36,16 +37,26 @@ function ContactForm({ addcontacts ,editingcontact, updateContact, handleClose }
     }
   };
 
-  const handleSubmit = () => {
-    
-      addcontacts({
-        id: Date.now(),
-        bookmarked: false,
-        ...form
-      });
-      handleClose();
+  const handleSubmit = async() => {
+    try {
+       const formdata = {
+      name:form.name,
+      contact:form.contact,
+      adress:form.adress,
+      label:form.label,
+      image:form.image
 
-    setForm({ name: "", contact: "", address: "", label: "", image: "" });
+    }
+    const response = await axios.post(`${baseUrl}/user`,formdata)
+    console.log(response.data);
+    addcontacts(response.data);
+    handleClose();
+    
+    } catch (error) {
+      console.log("Error fetching api")
+    }
+
+    setForm({ name: "", contact: "", adress: "", label: "", image: "" });
   };
 
   return (
@@ -68,10 +79,10 @@ function ContactForm({ addcontacts ,editingcontact, updateContact, handleClose }
         sx={{ margin: 1 }}
       />
       <TextField
-        name="address"
+        name="adress"
         label="Address"
         variant="outlined"
-        value={form.address}
+        value={form.adress}
         onChange={handleChange}
         sx={{ margin: 1 }}
       />

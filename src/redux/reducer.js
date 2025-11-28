@@ -15,17 +15,18 @@ export const phoneBookReducer = (state=initialState,action)=>{
             const exists = state.contacts.find(c=>c.contact===action.payload.contact)
             if(exists){
                alert("Contact already exists")
+               return state
             }else{
             return {
                 ...state, 
                 contacts:[...state.contacts,action.payload]
             }}
              
-            case DELETE_CONTACT:
+            case DELETE_CONTACT:console.log("delete contact triggered")
+
                 return{
                     ...state,
-                    contacts:state.contacts.filter((c)=>c.id!==action.payload)
-                }
+                    contacts:state.contacts.filter((c)=>c._id!==action.payload)}
 
             case EDIT_CONTACT:
                 console.log("edit button clicked")
@@ -34,9 +35,10 @@ export const phoneBookReducer = (state=initialState,action)=>{
                     editingcontact:action.payload
                 }
            case UPDATE_CONTACT:
+            console.log("update contact triggered")
             return{
                 ...state,
-                contacts:state.contacts.map((c)=>c.id===action.payload.id?action.payload:c),
+                contacts:state.contacts.map((c)=>c._id===action.payload._id?action.payload:c),
                 editingcontact:null
               
             }

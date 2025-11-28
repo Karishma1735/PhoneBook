@@ -1,19 +1,19 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Typography, Box, Button, Modal, TextField, Select, MenuItem, Avatar } from '@mui/material'
 import { connect } from 'react-redux'
 import { deleteContact, toggleBookmark, updateContact } from '../redux/actions'
 import BookmarkIcon from '@mui/icons-material/Bookmark';
 import ModeEditIcon from '@mui/icons-material/ModeEdit';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
+import { baseUrl } from '../../config';
+import axios from 'axios';
 
 function ContactItem({ contact, deleteContact, updateContact, toggleBookmark }) {
-  console.log(contact,"contact");
-  
   const [open, setOpen] = useState(false); 
   const [editForm, setEditForm] = useState({
     name: contact.name,
     contact: contact.contact,
-    address: contact.address,
+    adress: contact.adress,
     label: contact.label,
     image:contact.image||""
   });
@@ -22,14 +22,36 @@ function ContactItem({ contact, deleteContact, updateContact, toggleBookmark }) 
     setEditForm({ ...editForm, [e.target.name]: e.target.value });
   };
 
-  const handleSave = () => {
-  
-    updateContact({ ...editForm, id: contact.id,image:contact.image });
-    setOpen(false); 
-  };
+ const handleSave = async () => {
+  try {
+
+    const response = await axios.put(`${baseUrl}/edituser/${contact._id}`, editForm);
+      updateContact({
+        _id:contact._id,
+        ...editForm});
+      setOpen(false); 
+      console.log('updated contacts',response);
+ 
+  } catch (error) {
+    console.error('Error updating contact:', error);
+  }
+};
+
 
   const handleBookmark = () => {
-    toggleBookmark(contact.id);
+    toggleBookmark(contact._id);
+  };
+
+
+   const handleDelete = async () => {
+    try {
+      await axios.delete(`${baseUrl}/deleteusers/${contact._id}`);
+   
+      deleteContact(contact._id);
+      console.log('Contact deleted');
+    } catch (error) {
+      console.error('Error deleting contact:', error);
+    }
   };
 
   const handleOpen = () => setOpen(true); 
@@ -42,14 +64,14 @@ function ContactItem({ contact, deleteContact, updateContact, toggleBookmark }) 
       />
       <Typography sx={{margin:3}}>{contact.name}</Typography>
       <Typography sx={{margin:3}}>{contact.contact}</Typography>
-      <Typography sx={{margin:3}}>{contact.address}</Typography>
+      <Typography sx={{margin:3}}>{contact.adress||"NA"}</Typography>
       <Typography sx={{margin:3}}>{contact.label}</Typography>
 
       <Box sx={{ mt: 1, display: "flex", gap: 1 }}>
         <Button onClick={handleOpen}>
           <ModeEditIcon color="#000000" />
         </Button>
-        <Button color="error" onClick={() => deleteContact(contact.id)}>
+        <Button color="error" onClick={handleDelete}>
           <DeleteOutlineIcon color="error" />
         </Button>
         <Button onClick={handleBookmark}>
@@ -94,8 +116,8 @@ function ContactItem({ contact, deleteContact, updateContact, toggleBookmark }) 
           <TextField
             fullWidth
             label="Address"
-            name="address"
-            value={editForm.address}
+            name="adress"
+            value={editForm.adress}
             onChange={handleChange}
             sx={{ mb: 2 }}
           />
@@ -126,3 +148,4 @@ const mapDispatchToProps = {
 };
 
 export default connect(null, mapDispatchToProps)(ContactItem);
+

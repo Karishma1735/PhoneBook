@@ -5,9 +5,9 @@ export const addcontacts = (contact)=>({
     payload:contact,
 })
 
-export const deleteContact = (id)=>({
+export const deleteContact = (_id)=>({
     type:DELETE_CONTACT,
-    payload:id,
+    payload:_id,
 })
 
 export const editcontact = (contact)=>({
