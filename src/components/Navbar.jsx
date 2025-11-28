@@ -57,16 +57,22 @@ function Navbar({searchuser,filterByLabel}) {
             }}
             />
       <Select
-        label="Label"
-        onChange={(e) => filterByLabel(e.target.value)}
-        defaultValue=""
-        color="white"
-      >
-        <MenuItem value="">All</MenuItem>
-        <MenuItem value="Family">Family</MenuItem>
-        <MenuItem value="Friend">Friend</MenuItem>
-        <MenuItem value="Work">Work</MenuItem>
-      </Select>
+  label="Label"
+  onChange={(e) => filterByLabel(e.target.value)}
+  color="white"
+  sx={{
+    backgroundColor: '#f5f5f5',
+    borderRadius: '8px',
+    fontSize: '16px',
+    width:"80px"
+  }}
+>
+  <MenuItem value="">All</MenuItem>
+  <MenuItem value="Family">Family</MenuItem>
+  <MenuItem value="Friend">Friend</MenuItem>
+  <MenuItem value="Work">Work</MenuItem>
+</Select>
+
           <Button
             variant="contained"
             color="secondary"

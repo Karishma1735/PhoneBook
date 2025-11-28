@@ -1,8 +1,10 @@
-import { Box, TextField, Select, MenuItem, Button } from '@mui/material';
+import { Box, TextField, Select, MenuItem, Button, Typography } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { addcontacts, updateContact } from '../redux/actions';
 import { connect } from 'react-redux';
-function ContactForm({ addcontacts ,editingcontact,updateContact,handleClose}) {
+import axios from 'axios';
+
+function ContactForm({ addcontacts ,editingcontact, updateContact, handleClose }) {
   const [form, setForm] = useState({
     name: "",
     contact: "",
@@ -11,18 +13,6 @@ function ContactForm({ addcontacts ,editingcontact,updateContact,handleClose}) {
     image:"",
   });
 
-  useEffect(() => {
-    if (editingcontact) {
-      setForm({
-        name: editingcontact.name,
-        contact: editingcontact.contact,
-        address:editingcontact.address,
-        label:editingcontact.label,
-        image:editingcontact.image||"",
-      });
-    }
-  }, [editingcontact]);
-
   const handleChange = (e) => {
     setForm({
       ...form,
@@ -30,35 +20,37 @@ function ContactForm({ addcontacts ,editingcontact,updateContact,handleClose}) {
     });
   };
 
-  const handleImageUpload =(e)=>{
-    const file = e.target.files[0]
-    const reader = new FileReader()
- 
-    reader.onloadend=()=>{
-        setForm({...form,image:reader.result})
+  const handleImageUpload = async (e) => {
+    const file = e.target.files[0];
+
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('upload_preset', 'Phonebook_images');
+    formData.append('cloud_name', 'dtvwypwen'); 
+
+    try {
+      const response = await axios.post(`https://api.cloudinary.com/v1_1/dtvwypwen/image/upload`, formData);
+      setForm({ ...form, image: response.data.secure_url });
+    } catch (error) {
+      console.error("Error uploading image:", error);
     }
-   reader.readAsDataURL(file)
-  }
-  const handleSubmit = (e) => {
-    e.preventDefault()
-    console.log("Prevent default worked")
-    if (editingcontact) {
-      updateContact({
-        id: editingcontact.id,
-        ...form
-      });
-    } else {
+  };
+
+  const handleSubmit = () => {
+    
       addcontacts({
         id: Date.now(),
+        bookmarked: false,
         ...form
       });
-      handleClose()
-    }
-    setForm({ name: "", contact: "",address:"",label:"" });
+      handleClose();
 
+    setForm({ name: "", contact: "", address: "", label: "", image: "" });
   };
+
   return (
-    <Box sx={{ display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center",marginTop:5 }}>
+    <Box sx={{ display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center"}}>
+      <Typography>Add Contact</Typography>
       <TextField
         name="name"
         label="Name"
@@ -89,42 +81,36 @@ function ContactForm({ addcontacts ,editingcontact,updateContact,handleClose}) {
         onChange={handleChange}
         displayEmpty
         sx={{
-            width:"250px"
+            width: "250px"
         }}
       >
-
-
         <MenuItem value=""><em>Select Label</em></MenuItem>
         <MenuItem value="Work">Work</MenuItem>
         <MenuItem value="Friend">Friend</MenuItem>
         <MenuItem value="Family">Family</MenuItem>
       </Select>
-        <input
+      
+      <input
         type="file"
         accept="image/*"
         onChange={handleImageUpload}
         style={{ margin: '10px' }}
       />
-      <Button onClick={handleSubmit}>{editingcontact?"Update Contact":"Add contact"}</Button>
+  
+      <Button onClick={handleSubmit}>
+        {editingcontact ? "Update Contact" : "Add Contact"}
+      </Button>
     </Box>
   );
 }
 
-const mapStateToProps = (state)=>({
-    editingcontact:state.contactsData.editingcontact
-})
+const mapStateToProps = (state) => ({
+  editingcontact: state.contactsData.editingcontact,
+});
+
 const mapDispatchToProps = {
   addcontacts, 
   updateContact
 };
+
 export default connect(mapStateToProps, mapDispatchToProps)(ContactForm);
-
-
-
-
-
-
-
-
-
-

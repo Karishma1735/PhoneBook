@@ -3,29 +3,36 @@ import { Typography, Box, Button, Modal, TextField, Select, MenuItem, Avatar } f
 import { connect } from 'react-redux'
 import { deleteContact, toggleBookmark, updateContact } from '../redux/actions'
 import BookmarkIcon from '@mui/icons-material/Bookmark';
+import ModeEditIcon from '@mui/icons-material/ModeEdit';
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 
-
-
-function ContactItem({ contact, deleteContact, updateContact,toggleBookmark }) {
-  console.log("contact", contact)
-  const [open, setOpen] = useState(false);
+function ContactItem({ contact, deleteContact, updateContact, toggleBookmark }) {
+  console.log(contact,"contact");
+  
+  const [open, setOpen] = useState(false); 
   const [editForm, setEditForm] = useState({
     name: contact.name,
     contact: contact.contact,
     address: contact.address,
     label: contact.label,
+    image:contact.image||""
   });
+
   const handleChange = (e) => {
     setEditForm({ ...editForm, [e.target.name]: e.target.value });
   };
+
   const handleSave = () => {
-    updateContact({ ...editForm, id: contact.id });
-    setOpen(false);
+  
+    updateContact({ ...editForm, id: contact.id,image:contact.image });
+    setOpen(false); 
   };
-  const handleBookmark = ()=>{
-    toggleBookmark(contact.id)
-  }
-  const handleOPen = ()=>setOpen(true)
+
+  const handleBookmark = () => {
+    toggleBookmark(contact.id);
+  };
+
+  const handleOpen = () => setOpen(true); 
   return (
     <Box sx={{ display: "flex", justifyContent: "space-around", boxShadow: 1, margin: 2, padding: 3, fontFamily: "sans-serif", fontSize: "20px" }}>
       <Avatar
@@ -33,32 +40,21 @@ function ContactItem({ contact, deleteContact, updateContact,toggleBookmark }) {
         alt={contact.name}
         sx={{ width: 56, height: 56 }}
       />
-      <Typography>{contact.name}</Typography>
-      <Typography>{contact.contact}</Typography>
-      <Typography>{contact.label}</Typography>
-      <Typography>{contact.address}</Typography>
-       <Box sx={{ mt: 1, display: "flex", gap: 1 }}>
-        <Button variant="contained" onClick={handleOPen}>
-        Edit
-        </Button>
-        <Button
-          color="error"
-          variant="contained"
-          onClick={() => deleteContact(contact.id)}
-        >
-          Delete
-        </Button>
-         <Button
-          onClick={handleBookmark}
-        >
-          <BookmarkIcon   
+      <Typography sx={{margin:3}}>{contact.name}</Typography>
+      <Typography sx={{margin:3}}>{contact.contact}</Typography>
+      <Typography sx={{margin:3}}>{contact.address}</Typography>
+      <Typography sx={{margin:3}}>{contact.label}</Typography>
 
-          color={contact.bookmarked ? "secondary" : "primary"}
-         />
-        
+      <Box sx={{ mt: 1, display: "flex", gap: 1 }}>
+        <Button onClick={handleOpen}>
+          <ModeEditIcon color="#000000" />
         </Button>
-        
-      
+        <Button color="error" onClick={() => deleteContact(contact.id)}>
+          <DeleteOutlineIcon color="error" />
+        </Button>
+        <Button onClick={handleBookmark}>
+          <BookmarkIcon color={contact.bookmarked ? "secondary" : "primary"} />
+        </Button>
       </Box>
       <Modal
         open={open}
@@ -77,7 +73,7 @@ function ContactItem({ contact, deleteContact, updateContact,toggleBookmark }) {
           }}
         >
           <Typography variant="h6" sx={{ mb: 2 }}>
-            Edit
+            Edit Contact
           </Typography>
           <TextField
             fullWidth
@@ -99,7 +95,7 @@ function ContactItem({ contact, deleteContact, updateContact,toggleBookmark }) {
             fullWidth
             label="Address"
             name="address"
-            value={editForm.address}  
+            value={editForm.address}
             onChange={handleChange}
             sx={{ mb: 2 }}
           />
@@ -120,15 +116,13 @@ function ContactItem({ contact, deleteContact, updateContact,toggleBookmark }) {
         </Box>
       </Modal>
     </Box>
-  )
+  );
 }
 
 const mapDispatchToProps = {
   deleteContact,
   updateContact,
   toggleBookmark
-}
-export default connect(null, mapDispatchToProps)(ContactItem)
+};
 
-
-
+export default connect(null, mapDispatchToProps)(ContactItem);
