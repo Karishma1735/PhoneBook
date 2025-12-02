@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Typography, Box, Button, Modal, TextField, Select, MenuItem, Avatar, Tooltip } from '@mui/material';
 import { connect } from 'react-redux';
@@ -6,10 +7,35 @@ import BookmarkIcon from '@mui/icons-material/Bookmark';
 import ModeEditIcon from '@mui/icons-material/ModeEdit';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import BookmarkBorderIcon from '@mui/icons-material/BookmarkBorder';
- const phoneRegex = /^[+]?[0-9]{10,15}$/;
+import axios from 'axios';
+// import ModeEditIcon from '@mui/icons-material/ModeEdit';
+
+const phoneRegex = /^[+]?[0-9]{10,15}$/;
+
+const uploadImageToCloudinary = async (file) => {
+  const CLOUDINARY_URL = 'https://api.cloudinary.com/v1_1/dtvwypwen/image/upload';
+  const CLOUDINARY_UPLOAD_PRESET = 'Phonebook_images';
+
+  const formData = new FormData();
+  formData.append('file', file);
+  formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
+
+  try {
+    const response = await axios.post(CLOUDINARY_URL, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    return response.data.secure_url;
+  } catch (error) {
+    console.error("Error uploading image:", error);
+    throw error;
+  }
+};
+
 function ContactItem({ contact, deleteContact, updateContact, toggleBookmark }) {
   const [open, setOpen] = useState(false);
-  const [viewOpen, setViewOpen] = useState(false); 
+  const [viewOpen, setViewOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [editForm, setEditForm] = useState({
     name: contact.name,
@@ -19,19 +45,31 @@ function ContactItem({ contact, deleteContact, updateContact, toggleBookmark }) 
     image: contact.image || '',
   });
 
+ 
+  const handleImageChange = async (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      try {
+        const imageUrl = await uploadImageToCloudinary(file);
+        setEditForm({ ...editForm, image: imageUrl });
+      } catch (error) {
+        console.error('Image upload failed:', error);
+      }
+    }
+  };
+
   const handleChange = (e) => {
     setEditForm({ ...editForm, [e.target.name]: e.target.value });
   };
 
   const handleSave = () => {
-
     if (!phoneRegex.test(editForm.contact)) {
-      alert("Please enter a valid phone number");
+      alert('Please enter a valid phone number');
       return;
     }
     const confirmed = window.confirm('Are you sure you want to update this contact?');
     if (confirmed) {
-      updateContact({ ...editForm, id: contact.id, image: contact.image });
+      updateContact({ ...editForm, id: contact.id });
       setOpen(false);
     }
   };
@@ -42,11 +80,12 @@ function ContactItem({ contact, deleteContact, updateContact, toggleBookmark }) 
   };
 
   const handleOpen = (e) => {
-    e.stopPropagation(); 
+    e.stopPropagation();
+      setEditForm({ ...contact });
     setOpen(true);
   };
 
-  const handleViewOpen = () => setViewOpen(true); 
+  const handleViewOpen = () => setViewOpen(true);
   const handleViewClose = () => setViewOpen(false);
 
   const handleModalClick = (e) => {
@@ -71,22 +110,23 @@ function ContactItem({ contact, deleteContact, updateContact, toggleBookmark }) 
     <Box
       sx={{
         display: 'flex',
-        justifyContent: 'space-around',
+        alignItems: 'center',
+        // gap:10,
         boxShadow: 1,
-        margin: 2,
+        justifyContent: 'space-between',
         padding: 3,
         fontFamily: 'sans-serif',
         fontSize: '20px',
       }}
       onClick={handleViewOpen}
     >
-      <Avatar src={contact.image} alt={contact.name} sx={{ width: 56, height: 56 }} />
-      <Typography sx={{ margin: 3 }}>{contact.name}</Typography>
-      <Typography sx={{ margin: 3 }}>{contact.contact}</Typography>
-      <Typography sx={{ margin: 3 }}>{contact.address}</Typography>
-      <Typography sx={{ margin: 3 }}>{contact.label}</Typography>
+      <Avatar src={contact.image} alt={contact.name} sx={{margin:3, width: 56, height: 56 }} />
+      <Typography sx={{ margin: 3,marginBottom:0 ,marginLeft:10,width:90}}>{contact.name}</Typography>
+      <Typography sx={{ margin: 3 ,width:90}}>{contact.contact}</Typography>
+      <Typography sx={{ margin: 3 ,width:90}}>{contact.address}</Typography>
+      <Typography sx={{ margin: 3,width:90 }}>{contact.label}</Typography>
 
-      <Box sx={{ mt: 1, display: 'flex', gap: 1 }}>
+      <Box sx={{ display: 'flex', gap: 1 }}>
         <Button onClick={handleOpen}>
           <Tooltip
             title='Edit'
@@ -161,6 +201,48 @@ function ContactItem({ contact, deleteContact, updateContact, toggleBookmark }) 
           <Typography variant='h6' sx={{ mb: 2 }}>
             Edit Contact
           </Typography>
+
+         <Box sx={{ position: 'relative', display: 'inline-block' }}>
+  {editForm.image && (
+    <Avatar 
+      src={editForm.image} 
+      alt="Preview" 
+      sx={{ width: 80, height: 80, mb: 2 }}
+    />
+  )}
+
+  <Button 
+    variant="outlined" 
+    component="label" 
+    sx={{
+      position: 'absolute',
+      top: 0,
+      right: 0,
+      backgroundColor: 'rgba(0, 0, 0, 0.5)',
+      borderRadius: '50%',
+      color: 'white',
+      padding: '3px',
+      zIndex: 1,
+      minWidth: 'unset',
+      height: 'auto',
+      width: 'auto', 
+      display: 'flex', 
+      justifyContent: 'center',
+      alignItems: 'center',
+    }}
+  >
+    <ModeEditIcon sx={{ fontSize: 24 }} />
+    <input
+      type="file"
+      hidden
+      accept="image/*"
+      onChange={handleImageChange}
+    />
+  </Button>
+</Box>
+
+
+
           <TextField
             fullWidth
             label='Name'
@@ -196,6 +278,20 @@ function ContactItem({ contact, deleteContact, updateContact, toggleBookmark }) 
             <MenuItem value='Friend'>Friend</MenuItem>
             <MenuItem value='Family'>Family</MenuItem>
           </Select>
+
+          {/* <Button variant="outlined" component="label" fullWidth sx={{ mb: 2 }}>
+            Upload Image
+            <input
+              type="file"
+              hidden
+              accept="image/*"
+              onChange={handleImageChange}
+            />
+          </Button>
+          {editForm.image && (
+            <Avatar src={editForm.image} alt="Preview" sx={{ width: 56, height: 56, mb: 2 }} />
+          )} */}
+
           <Button variant='contained' fullWidth onClick={handleSave}>
             Update Contact
           </Button>
@@ -256,12 +352,13 @@ function ContactItem({ contact, deleteContact, updateContact, toggleBookmark }) 
           }}
         >
           <Typography variant='h6' sx={{ mb: 2 }}>
-            Are you sure you want to delete this contact?
+            Are you sure you want to delete {contact.name} contact?
           </Typography>
           <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
             <Button variant='outlined' color='error' onClick={(e) => {
               e.stopPropagation();
-              handleDeleteClose()}}>
+              handleDeleteClose();
+            }}>
               Cancel
             </Button>
             <Button variant='contained' color='error' onClick={handleDeleteConfirm}>
@@ -281,4 +378,3 @@ const mapDispatchToProps = {
 };
 
 export default connect(null, mapDispatchToProps)(ContactItem);
-

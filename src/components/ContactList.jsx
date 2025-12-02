@@ -13,15 +13,6 @@ function ContactList({ contacts, search ,filtering}) {
     : contacts
   const filteredContacts = labelFiltered.filter((c) => c.name.includes(search));
 
-  // const sortedContacts = filteredContacts.sort((a, b) => {
-  //   if(b.bookmarked!==a.bookmarked){
-  //     return b.bookmarked - a.bookmarked
-  //   }
-  //   if (a.name < b.name) return -1; 
-  //   if (a.name > b.name) return 1;   
-  //    return 0
-  // });
-
 const sortedContacts = useMemo(() => {
   console.log("Filtered Contacts before sorting: ", filteredContacts);
   
@@ -29,12 +20,10 @@ const sortedContacts = useMemo(() => {
     if (a.bookmarked !== b.bookmarked) {
       return a.bookmarked ? -1 : 1;
     }
-
-    if (a.name < b.name) return -1;
-    if (a.name > b.name) return 1;
-
-    if (new Date(a.updatedAt) < new Date(b.updatedAt)) return 1;
-    if (new Date(a.updatedAt) > new Date(b.updatedAt)) return -1;
+    const nameComparison = a.name.localeCompare(b.name);
+    if (nameComparison !== 0) return nameComparison;
+    const updatedAtComparison = new Date(b.updatedAt) - new Date(a.updatedAt); 
+    if (updatedAtComparison !== 0) return updatedAtComparison;
 
     return 0;
   });
@@ -42,6 +31,11 @@ const sortedContacts = useMemo(() => {
   console.log("Sorted Contacts: ", sorted);
   return sorted;
 }, [filteredContacts]);
+
+
+//   console.log("Sorted Contacts: ", sorted);
+//   return sorted;
+// }, [filteredContacts]);
 
 
 
