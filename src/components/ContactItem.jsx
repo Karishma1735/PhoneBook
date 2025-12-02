@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Typography, Box, Button, Modal, TextField, Select, MenuItem, Avatar, Tooltip } from '@mui/material';
 import { connect } from 'react-redux';
@@ -8,30 +7,31 @@ import ModeEditIcon from '@mui/icons-material/ModeEdit';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import BookmarkBorderIcon from '@mui/icons-material/BookmarkBorder';
 import axios from 'axios';
+import ImageUploader from '../utils/Imageuploader';
 // import ModeEditIcon from '@mui/icons-material/ModeEdit';
 
 const phoneRegex = /^[+]?[0-9]{10,15}$/;
 
-const uploadImageToCloudinary = async (file) => {
-  const CLOUDINARY_URL = 'https://api.cloudinary.com/v1_1/dtvwypwen/image/upload';
-  const CLOUDINARY_UPLOAD_PRESET = 'Phonebook_images';
+// const uploadImageToCloudinary = async (file) => {
+//   const CLOUDINARY_URL = 'https://api.cloudinary.com/v1_1/dtvwypwen/image/upload';
+//   const CLOUDINARY_UPLOAD_PRESET = 'Phonebook_images';
 
-  const formData = new FormData();
-  formData.append('file', file);
-  formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
+//   const formData = new FormData();
+//   formData.append('file', file);
+//   formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
 
-  try {
-    const response = await axios.post(CLOUDINARY_URL, formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    });
-    return response.data.secure_url;
-  } catch (error) {
-    console.error("Error uploading image:", error);
-    throw error;
-  }
-};
+//   try {
+//     const response = await axios.post(CLOUDINARY_URL, formData, {
+//       headers: {
+//         'Content-Type': 'multipart/form-data',
+//       },
+//     });
+//     return response.data.secure_url;
+//   } catch (error) {
+//     console.error("Error uploading image:", error);
+//     throw error;
+//   }
+// };
 
 function ContactItem({ contact, deleteContact, updateContact, toggleBookmark }) {
   const [open, setOpen] = useState(false);
@@ -44,19 +44,21 @@ function ContactItem({ contact, deleteContact, updateContact, toggleBookmark }) 
     label: contact.label,
     image: contact.image || '',
   });
-
- 
-  const handleImageChange = async (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      try {
-        const imageUrl = await uploadImageToCloudinary(file);
-        setEditForm({ ...editForm, image: imageUrl });
-      } catch (error) {
-        console.error('Image upload failed:', error);
-      }
-    }
+   const handleImageUpload = ({ imageUrl, imagePublicId }) => {
+    setEditForm({ ...editForm, image: imageUrl });
   };
+ 
+  // const handleImageChange = async (e) => {
+  //   const file = e.target.files[0];
+  //   if (file) {
+  //     try {
+  //       const imageUrl = await uploadImageToCloudinary(file);
+  //       setEditForm({ ...editForm, image: imageUrl });
+  //     } catch (error) {
+  //       console.error('Image upload failed:', error);
+  //     }
+  //   }
+  // };
 
   const handleChange = (e) => {
     setEditForm({ ...editForm, [e.target.name]: e.target.value });
@@ -232,12 +234,15 @@ function ContactItem({ contact, deleteContact, updateContact, toggleBookmark }) 
     }}
   >
     <ModeEditIcon sx={{ fontSize: 24 }} />
-    <input
+  {/* <input
       type="file"
       hidden
       accept="image/*"
       onChange={handleImageChange}
-    />
+    /> */}
+    <Box sx={{ display: 'none' }}>
+  <ImageUploader onUpload={handleImageUpload} />
+</Box>
   </Button>
 </Box>
 

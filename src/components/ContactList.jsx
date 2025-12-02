@@ -13,6 +13,11 @@ function ContactList({ contacts, search ,filtering}) {
     : contacts
   const filteredContacts = labelFiltered.filter((c) => c.name.includes(search));
 
+
+  const handlePageClick = (pageNumber) => {
+    setCurrentpage(pageNumber);
+  };
+
 const sortedContacts = useMemo(() => {
   console.log("Filtered Contacts before sorting: ", filteredContacts);
   
@@ -32,30 +37,22 @@ const sortedContacts = useMemo(() => {
   return sorted;
 }, [filteredContacts]);
 
-
-//   console.log("Sorted Contacts: ", sorted);
-//   return sorted;
-// }, [filteredContacts]);
-
-
-
-
   const lastIndex = contactPerPage * currentPage
   const firstIndex = lastIndex- contactPerPage
   const currentContacts = sortedContacts.slice(firstIndex,lastIndex)
   const totalPages = Math.ceil(sortedContacts.length/contactPerPage)
 
-  const handleNext = ()=>{
-    if(currentPage<totalPages){
-      setCurrentpage(currentPage+1)
-    }
-  }
-const handlePrev = () => {
-  if (currentPage > 1) {
-    setCurrentpage(currentPage - 1);
-    console.log("prev clicked");
-  }
-};  
+//   const handleNext = ()=>{
+//     if(currentPage<totalPages){
+//       setCurrentpage(currentPage+1)
+//     }
+//   }
+// const handlePrev = () => {
+//   if (currentPage > 1) {
+//     setCurrentpage(currentPage - 1);
+//     console.log("prev clicked");
+//   }
+// };  
 
   return (
    
@@ -68,24 +65,28 @@ const handlePrev = () => {
       )}
 
 
-      <Box sx={{display:"flex",
-        justifyContent:"space-between",
-        margin:2
-      }}>
-       
+   <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", margin: 2 }}>
+  <Box sx={{ display: "flex", gap: 1 }}>
+    {Array.from({ length: totalPages }, (_, index) => {
+      const pageNumber = index + 1;
+      return (
+        <Button
+          key={pageNumber}
+          onClick={() => handlePageClick(pageNumber)}
+          variant={pageNumber === currentPage ? "contained" : "outlined"}
+          sx={{
+            fontWeight: "bold",
+            color: pageNumber === currentPage ? "white" : "black",
+          }}
+        >
+          {pageNumber}
+        </Button>
+      );
+    })}
+  </Box>
+</Box>
 
-        <Button onClick={handlePrev}
-          disabled={currentPage === 1}
-          sx={{font:"bold"}}
-        >Previous</Button>
-         <Box component="span" sx={{marginTop:1}}>
-         Page {currentPage} of {totalPages}
-        </Box>
 
-        <Button onClick={handleNext} disabled={currentPage === totalPages}
-
-        >Next</Button>
-      </Box>
     </Box>
   );
 }

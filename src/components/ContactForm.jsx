@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { addcontacts, updateContact } from '../redux/actions';
 import { connect } from 'react-redux';
 import axios from 'axios';
+import ImageUploader from '../utils/Imageuploader';
 
 function ContactForm({ addcontacts ,editingcontact, updateContact, handleClose }) {
   const [form, setForm] = useState({
@@ -20,28 +21,28 @@ function ContactForm({ addcontacts ,editingcontact, updateContact, handleClose }
     });
   };
 
-  const handleImageUpload = async (e) => {
-    const file = e.target.files[0];
+  // const handleImageUpload = async (e) => {
+  //   const file = e.target.files[0];
 
-    const formData = new FormData();
-    formData.append('file', file);
-    formData.append('upload_preset', 'Phonebook_images');
-    formData.append('cloud_name', 'dtvwypwen'); 
+  //   const formData = new FormData();
+  //   formData.append('file', file);
+  //   formData.append('upload_preset', 'Phonebook_images');
+  //   formData.append('cloud_name', 'dtvwypwen'); 
 
-    try {
-      const response = await axios.post(`https://api.cloudinary.com/v1_1/dtvwypwen/image/upload`, formData);
-      setForm({ ...form, 
-        image: response.data.secure_url ,
-        imagePublicId: response.data.public_id,
+  //   try {
+  //     const response = await axios.post(`https://api.cloudinary.com/v1_1/dtvwypwen/image/upload`, formData);
+  //     setForm({ ...form, 
+  //       image: response.data.secure_url ,
+  //       imagePublicId: response.data.public_id,
 
-      });
-    } catch (error) {
-      console.error("Error uploading image:", error);
-    }
-  };
+  //     });
+  //   } catch (error) {
+  //     console.error("Error uploading image:", error);
+  //   }
+  // };
 
   const handleSubmit = () => {
-    
+    console.log("Form submitted:", form); 
       addcontacts({
         id: Date.now(),
         bookmarked: false,
@@ -94,11 +95,14 @@ function ContactForm({ addcontacts ,editingcontact, updateContact, handleClose }
         <MenuItem value="Family">Family</MenuItem>
       </Select>
       
-      <input
+      {/* <input
         type="file"
         accept="image/*"
         onChange={handleImageUpload}
         style={{ margin: '10px' }}
+      /> */}
+     <ImageUploader 
+        onUpload={(imgData) => setForm({ ...form, image: imgData.imageUrl, imagePublicId: imgData.imagePublicId })}
       />
   
       <Button onClick={handleSubmit}>
