@@ -10,6 +10,7 @@ export const deleteContact = (id)=>({
     payload:id,
 })
 
+
 export const editcontact = (contact)=>({
     type:EDIT_CONTACT,
     payload:contact

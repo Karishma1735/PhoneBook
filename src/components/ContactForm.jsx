@@ -30,7 +30,11 @@ function ContactForm({ addcontacts ,editingcontact, updateContact, handleClose }
 
     try {
       const response = await axios.post(`https://api.cloudinary.com/v1_1/dtvwypwen/image/upload`, formData);
-      setForm({ ...form, image: response.data.secure_url });
+      setForm({ ...form, 
+        image: response.data.secure_url ,
+        imagePublicId: response.data.public_id,
+
+      });
     } catch (error) {
       console.error("Error uploading image:", error);
     }

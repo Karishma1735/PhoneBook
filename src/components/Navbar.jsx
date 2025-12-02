@@ -13,10 +13,11 @@ import {
   Select,
   MenuItem
 } from "@mui/material";
-  import SearchIcon from '@mui/icons-material/Search';
+import SearchIcon from '@mui/icons-material/Search';
 import ContactForm from "../components/ContactForm";
 import { filterByLabel, searchuser } from "../redux/actions";
 import { connect } from "react-redux";
+
 const style = {
   position: "absolute",
   top: "50%",
@@ -28,60 +29,74 @@ const style = {
   p: 4,
   borderRadius: "10px",
 };
-function Navbar({searchuser,filterByLabel}) {
+
+function Navbar({ searchuser, filterByLabel }) {
   const [open, setOpen] = useState(false);
+  const [selectedLabel, setSelectedLabel] = useState("");
+
+  const handleSelectChange = (e) => {
+    const value = e.target.value;
+    setSelectedLabel(value);
+    filterByLabel(value); 
+  };
+
   return (
     <>
       <AppBar position="static">
-        <Toolbar
-          sx={{ display: "flex", justifyContent: "space-between", px: 2 }}
-        >
+        <Toolbar sx={{ display: "flex", justifyContent: "space-between", px: 2 }}>
           <Typography variant="h6">Phonebook</Typography>
-            <TextField
-             label="Search"
-             onChange={(e)=>searchuser(e.target.value)}
+          <TextField
+            label="Search"
+            onChange={(e) => searchuser(e.target.value)}
             InputProps={{
-            endAdornment: (
-              <InputAdornment position="end">
-                <IconButton aria-label="search">
-                  <SearchIcon />
-                </IconButton>
-              </InputAdornment>
-            ),
-          }}
-            sx={{
-              overflow:"hidden",
-              bgcolor:"white",
-              outline:"none"
-              
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton aria-label="search">
+                    <SearchIcon />
+                  </IconButton>
+                </InputAdornment>
+              ),
             }}
-            />
-      <Select
-  label="Label"
-  onChange={(e) => filterByLabel(e.target.value)}
-  color="white"
-  sx={{
-    backgroundColor: '#f5f5f5',
-    borderRadius: '8px',
-    fontSize: '16px',
-    width:"80px"
-  }}
->
-  <MenuItem value="">All</MenuItem>
-  <MenuItem value="Family">Family</MenuItem>
-  <MenuItem value="Friend">Friend</MenuItem>
-  <MenuItem value="Work">Work</MenuItem>
-</Select>
+            sx={{
+              overflow: "hidden",
+              bgcolor: "white",
+              outline: "none",
+            }}
+          />
+          <Select
+            label="Label"
+            value={selectedLabel}
+            displayEmpty
+            onChange={handleSelectChange}
+            renderValue={(selected) => {
+              if (selected === "") return "All"; 
+              return selected;
+            }}
+      
+            sx={{
+              backgroundColor: '#FFF',
+              borderRadius: '8px',
+              fontSize: '16px',
+              width: "100px",
+              padding:'0'
+            }}
+          >
+            <MenuItem value="">All</MenuItem>
+            <MenuItem value="Family">Family</MenuItem>
+            <MenuItem value="Friend">Friend</MenuItem>
+            <MenuItem value="Work">Work</MenuItem>
+          </Select>
 
           <Button
             variant="contained"
             color="secondary"
             onClick={() => setOpen(true)}
           >
-          Create Contact
+            Create Contact
           </Button>
         </Toolbar>
       </AppBar>
+
       <Modal open={open} onClose={() => setOpen(false)}>
         <Box sx={style}>
           <ContactForm handleClose={() => setOpen(false)} />
@@ -90,14 +105,10 @@ function Navbar({searchuser,filterByLabel}) {
     </>
   );
 }
+
 const mapDispatchToProps = {
   searchuser,
-  filterByLabel
-}
-export default connect(null,mapDispatchToProps)(Navbar);
+  filterByLabel,
+};
 
-
-
-
-
-
+export default connect(null, mapDispatchToProps)(Navbar);
