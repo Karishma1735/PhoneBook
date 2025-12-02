@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { connect } from "react-redux";
 import ContactItem from "./ContactItem";
 import { Box, Button, Typography } from "@mui/material";
+import { useMemo } from 'react';
 
 function ContactList({ contacts, search ,filtering}) {
    console.log('Current filtering value:', contacts.length);
@@ -12,16 +13,37 @@ function ContactList({ contacts, search ,filtering}) {
     : contacts
   const filteredContacts = labelFiltered.filter((c) => c.name.includes(search));
 
-  const sortedContacts = filteredContacts.sort((a, b) => {
-    if(b.bookmarked!==a.bookmarked){
-      return b.bookmarked - a.bookmarked
-    }
-    // if (a.name < b.name) return -1; 
-    // if (a.name > b.name) return 1;   
-    //  return 0
+  // const sortedContacts = filteredContacts.sort((a, b) => {
+  //   if(b.bookmarked!==a.bookmarked){
+  //     return b.bookmarked - a.bookmarked
+  //   }
+  //   if (a.name < b.name) return -1; 
+  //   if (a.name > b.name) return 1;   
+  //    return 0
+  // });
 
-    return a.name.localeCompare(b.name)
+const sortedContacts = useMemo(() => {
+  console.log("Filtered Contacts before sorting: ", filteredContacts);
+  
+  const sorted = [...filteredContacts].sort((a, b) => {
+    if (a.bookmarked !== b.bookmarked) {
+      return a.bookmarked ? -1 : 1;
+    }
+
+    if (a.name < b.name) return -1;
+    if (a.name > b.name) return 1;
+
+    if (new Date(a.updatedAt) < new Date(b.updatedAt)) return 1;
+    if (new Date(a.updatedAt) > new Date(b.updatedAt)) return -1;
+
+    return 0;
   });
+
+  console.log("Sorted Contacts: ", sorted);
+  return sorted;
+}, [filteredContacts]);
+
+
 
 
   const lastIndex = contactPerPage * currentPage

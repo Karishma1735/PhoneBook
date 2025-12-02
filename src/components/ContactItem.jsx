@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Typography, Box, Button, Modal, TextField, Select, MenuItem, Avatar, Tooltip } from '@mui/material';
 import { connect } from 'react-redux';
@@ -7,13 +6,11 @@ import BookmarkIcon from '@mui/icons-material/Bookmark';
 import ModeEditIcon from '@mui/icons-material/ModeEdit';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import BookmarkBorderIcon from '@mui/icons-material/BookmarkBorder';
-import axios from 'axios';
-
+ const phoneRegex = /^[+]?[0-9]{10,15}$/;
 function ContactItem({ contact, deleteContact, updateContact, toggleBookmark }) {
-  console.log(contact, 'contact');
-
   const [open, setOpen] = useState(false);
   const [viewOpen, setViewOpen] = useState(false); 
+  const [deleteOpen, setDeleteOpen] = useState(false);
   const [editForm, setEditForm] = useState({
     name: contact.name,
     contact: contact.contact,
@@ -27,12 +24,20 @@ function ContactItem({ contact, deleteContact, updateContact, toggleBookmark }) 
   };
 
   const handleSave = () => {
-    updateContact({ ...editForm, id: contact.id, image: contact.image });
-    setOpen(false);
+
+    if (!phoneRegex.test(editForm.contact)) {
+      alert("Please enter a valid phone number");
+      return;
+    }
+    const confirmed = window.confirm('Are you sure you want to update this contact?');
+    if (confirmed) {
+      updateContact({ ...editForm, id: contact.id, image: contact.image });
+      setOpen(false);
+    }
   };
 
   const handleBookmark = (e) => {
-    e.stopPropagation()
+    e.stopPropagation();
     toggleBookmark(contact.id);
   };
 
@@ -48,37 +53,19 @@ function ContactItem({ contact, deleteContact, updateContact, toggleBookmark }) 
     e.stopPropagation();
   };
 
+  const handleDeleteOpen = (e) => {
+    e.stopPropagation();
+    setDeleteOpen(true);
+  };
 
-const handleDelete = async (e) => {
-  e.stopPropagation();
+  const handleDeleteClose = () => {
+    setDeleteOpen(false);
+  };
 
-  try {
-    if (contact.imagePublicId) {
-      const cloudinaryDeleteUrl = `https://api.cloudinary.com/v1_1/dtvwypwen/image/destroy`;
-      const data = {
-        public_id: contact.imagePublicId,
-        api_key: "874245128391472",
-        timestamp: Math.floor(Date.now() / 1000),
-      };
-
-      console.log(contact.imagePublicId, "public id coming");
-      console.log("Request Data:", data);
-
-      const response = await axios.post(cloudinaryDeleteUrl, data, {
-        headers: {
-          'Content-Type': 'application/json', 
-        },
-      });
-
-      console.log(response.data, "response from Cloudinary");
-      console.log('Image deleted from Cloudinary');
-    }
+  const handleDeleteConfirm = () => {
     deleteContact(contact.id);
-  } catch (error) {
-    console.error('Error deleting contact or image:', error);
-  }
-};
-
+    setDeleteOpen(false);
+  };
 
   return (
     <Box
@@ -118,11 +105,7 @@ const handleDelete = async (e) => {
         </Button>
         <Button
           color='error'
-          onClick={(e) => {
-            e.stopPropagation(); 
-            deleteContact(contact.id);
-          }}
-          // onClick={handleDelete}
+          onClick={handleDeleteOpen}
         >
           <Tooltip
             title='Delete'
@@ -160,6 +143,7 @@ const handleDelete = async (e) => {
           </Tooltip>
         </Button>
       </Box>
+
       <Modal open={open} onClose={() => setOpen(false)}>
         <Box
           sx={{
@@ -235,6 +219,11 @@ const handleDelete = async (e) => {
           <Typography variant='h6' sx={{ mb: 2 }}>
             Contact Details
           </Typography>
+          <Avatar
+            src={contact.image}
+            alt={contact.name}
+            sx={{ width: 100, height: 100, mb: 2 }}
+          />
           <Typography sx={{ mb: 2 }}>
             <strong>Name:</strong> {contact.name}
           </Typography>
@@ -247,14 +236,38 @@ const handleDelete = async (e) => {
           <Typography sx={{ mb: 2 }}>
             <strong>Label:</strong> {contact.label}
           </Typography>
-          <Avatar
-            src={contact.image}
-            alt={contact.name}
-            sx={{ width: 100, height: 100, mb: 2 }}
-          />
           <Button variant='contained' fullWidth onClick={handleViewClose}>
             Close
           </Button>
+        </Box>
+      </Modal>
+
+      <Modal open={deleteOpen} onClose={handleDeleteClose}>
+        <Box
+          sx={{
+            width: 400,
+            bgcolor: 'white',
+            p: 4,
+            borderRadius: 2,
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+          }}
+        >
+          <Typography variant='h6' sx={{ mb: 2 }}>
+            Are you sure you want to delete this contact?
+          </Typography>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+            <Button variant='outlined' color='error' onClick={(e) => {
+              e.stopPropagation();
+              handleDeleteClose()}}>
+              Cancel
+            </Button>
+            <Button variant='contained' color='error' onClick={handleDeleteConfirm}>
+              Delete
+            </Button>
+          </Box>
         </Box>
       </Modal>
     </Box>

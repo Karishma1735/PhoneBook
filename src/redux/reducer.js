@@ -7,7 +7,7 @@ const initialState = {
     filtering: "",
 };
 
-const phoneRegex = /^\d{10}$/; 
+const phoneRegex = /^\d{10}$/;
 
 export const phoneBookReducer = (state = initialState, action) => {
     switch (action.type) {
@@ -45,7 +45,7 @@ export const phoneBookReducer = (state = initialState, action) => {
 
             if (!phoneRegex.test(updatedContact.contact)) {
                 alert("Please enter a valid phone number");
-                console.log( updatedContact.contact);
+                console.log(updatedContact.contact);
                 return state;
             }
 
@@ -53,7 +53,7 @@ export const phoneBookReducer = (state = initialState, action) => {
             return {
                 ...state,
                 contacts: state.contacts.map((c) =>
-                    c.id === updatedContact.id ? updatedContact : c
+                    c.id === updatedContact.id ? { ...c, ...updatedContact } : c
                 ),
                 editingcontact: null,
             };
