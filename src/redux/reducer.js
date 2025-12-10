@@ -1,4 +1,4 @@
-import { ADD_CONTACT, DELETE_CONTACT, EDIT_CONTACT, FILTER_LABEL, SEARCH_USER, TOGGLE_BOOKMARK, UPDATE_CONTACT } from "./actionTypes";
+import { ADD_CONTACT, DELETE_CONTACT, EDIT_CONTACT, FETCH_CONTACT, FILTER_LABEL, SEARCH_USER, TOGGLE_BOOKMARK, UPDATE_CONTACT } from "./actionTypes";
 
 const initialState = {
     contacts: [],
@@ -23,11 +23,16 @@ export const phoneBookReducer = (state = initialState, action) => {
     };
 
             break;
+                case FETCH_CONTACT:
+            return {
+                ...state,
+                contacts: action.payload.data,
+            };
 
         case DELETE_CONTACT:
             return {
                 ...state,
-                contacts: state.contacts.filter((c) => c.id !== action.payload),
+                contacts: state.contacts.filter((c) => c._id !== action.payload),
             };
 
         case EDIT_CONTACT:
@@ -37,27 +42,8 @@ export const phoneBookReducer = (state = initialState, action) => {
                 editingcontact: action.payload,
             };
 
-        // case UPDATE_CONTACT:
-        //     const updatedContact = action.payload;
-        //     console.log("Updating", updatedContact);
-
-        //     if (!phoneRegex.test(updatedContact.contact)) {
-        //         alert("Please enter a valid phone number");
-        //         console.log(updatedContact.contact);
-        //         return state;
-        //     }
-
-        //     console.log("Valid phone number, updating contact...");
-        //     return {
-        //         ...state,
-        //         contacts: state.contacts.map((c) =>
-        //             c.id === updatedContact.id ? { ...c, ...updatedContact } : c
-        //         ),
-        //         editingcontact: null,
-        //     };
-
-
         case UPDATE_CONTACT:
+              console.log('Updated Contact:', action.payload);
     const updated = action.payload;
     if (!phoneRegex.test(updated.contact)) {
         return state; 
@@ -65,7 +51,7 @@ export const phoneBookReducer = (state = initialState, action) => {
     return {
         ...state,
         contacts: state.contacts.map(c =>
-            c.id === updated.id ? { ...c, ...updated } : c
+            c._id === updated._id ? { ...c, ...updated } : c
         ),
         editingcontact: null,
     };

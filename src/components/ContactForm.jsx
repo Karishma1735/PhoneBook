@@ -25,35 +25,52 @@ const [error, setError] = useState("");
   };
 
 
-  const handleSubmit = () => {
-    if (!form.name || !form.contact) {
-      setShowAlert(true);
-      return;
-    }
-     if (!/^\d{10}$/.test(form.contact)) {
-    setError("Phone number must be 10 digits");
+  // const handleSubmit = () => {
+  //   if (!form.name || !form.contact) {
+  //     setShowAlert(true);
+  //     return;
+  //   }
+  //    if (!/^\d{10}$/.test(form.contact)) {
+  //   setError("Phone number must be 10 digits");
+  //   setShowAlert(true);
+  //   return;
+  // }
+
+  //   const contactExists = contacts.find(
+  //   (c) => c.contact === form.contact
+  // );
+
+  // if (contactExists) {
+  //   setError("Contact already exists");
+  //   setShowAlert(true);
+  //   return;
+  // }
+
+  //   addcontacts({
+  //     id: Date.now(),
+  //     bookmarked: false,
+  //     ...form,
+  //   });
+  //   handleClose();
+  //   setForm({ name: "", contact: "", address: "", label: "", image: "" });
+  // };
+const handleSubmit = () => {
+  if (!form.name || !form.contact) {
     setShowAlert(true);
     return;
   }
 
-    const contactExists = contacts.find(
-    (c) => c.contact === form.contact
-  );
+  addcontacts({
+    name: form.name,
+    contact: form.contact,
+    label: form.label,
+    image: form.image,
+  });
+console.log();
 
-  if (contactExists) {
-    setError("Contact already exists");
-    setShowAlert(true);
-    return;
-  }
-
-    addcontacts({
-      id: Date.now(),
-      bookmarked: false,
-      ...form,
-    });
-    handleClose();
-    setForm({ name: "", contact: "", address: "", label: "", image: "" });
-  };
+  handleClose();
+  setForm({ name: "", contact: "", address: "", label: "", image: "" });
+};
 
   return (
     <Box

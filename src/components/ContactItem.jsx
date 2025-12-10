@@ -8,39 +8,18 @@ import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import BookmarkBorderIcon from '@mui/icons-material/BookmarkBorder';
 import axios from 'axios';
 import ImageUploader from '../utils/Imageuploader';
-// import ModeEditIcon from '@mui/icons-material/ModeEdit';
 
 const phoneRegex = /^[+]?[0-9]{10,15}$/;
 
-// const uploadImageToCloudinary = async (file) => {
-//   const CLOUDINARY_URL = 'https://api.cloudinary.com/v1_1/dtvwypwen/image/upload';
-//   const CLOUDINARY_UPLOAD_PRESET = 'Phonebook_images';
-
-//   const formData = new FormData();
-//   formData.append('file', file);
-//   formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
-
-//   try {
-//     const response = await axios.post(CLOUDINARY_URL, formData, {
-//       headers: {
-//         'Content-Type': 'multipart/form-data',
-//       },
-//     });
-//     return response.data.secure_url;
-//   } catch (error) {
-//     console.error("Error uploading image:", error);
-//     throw error;
-//   }
-// };
-
 function ContactItem({ contact, deleteContact, updateContact, toggleBookmark }) {
   const [open, setOpen] = useState(false);
+  
   const [viewOpen, setViewOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [editForm, setEditForm] = useState({
     name: contact.name,
     contact: contact.contact,
-    address: contact.address,
+    adress: contact.adress,
     label: contact.label,
     image: contact.image || '',
   });
@@ -67,7 +46,7 @@ const [snackbarMessage, setSnackbarMessage] = useState('');
   };
 const handleConfirmSave = (e) => {
   e.stopPropagation()
-    updateContact({ ...editForm, id: contact.id });
+    updateContact({ ...editForm, _id: contact._id });
     setOpen(false);
     setConfirmationModalOpen(false); 
   };
@@ -105,7 +84,7 @@ const handleConfirmSave = (e) => {
   };
 
   const handleDeleteConfirm = () => {
-    deleteContact(contact.id);
+    deleteContact(contact._id);
     setDeleteOpen(false);
   };
 
@@ -128,7 +107,7 @@ const handleConfirmSave = (e) => {
       <Avatar src={contact.image} alt={contact.name} sx={{margin:3, width: 56, height: 56 }} />
       <Typography sx={{ margin: 3,marginLeft:10,width:90}}>{contact.name||"NA"}</Typography>
       <Typography sx={{ margin: 3 ,width:90}}>{contact.contact||"NA"}</Typography>
-      <Typography sx={{ margin: 3 ,width:90}}>{contact.address||"NA"}</Typography>
+      <Typography sx={{ margin: 3 ,width:90}}>{contact.adress||"NA"}</Typography>
       <Typography sx={{ margin: 3,width:90 }}>{contact.label||"NA"}</Typography>
 
       <Box sx={{ display: 'flex', gap: 1 }}>
@@ -284,8 +263,8 @@ const handleConfirmSave = (e) => {
           <TextField
             fullWidth
             label='Address'
-            name='address'
-            value={editForm.address}
+            name='adress'
+            value={editForm.adress}
             onChange={handleChange}
             sx={{ mb: 2 }}
           />
@@ -373,7 +352,7 @@ const handleConfirmSave = (e) => {
             <strong>Contact:</strong> {contact.contact}
           </Typography>
           <Typography sx={{ mb: 2 }}>
-            <strong>Address:</strong> {contact.address}
+            <strong>Address:</strong> {contact.adress}
           </Typography>
           <Typography sx={{ mb: 2 }}>
             <strong>Label:</strong> {contact.label}
