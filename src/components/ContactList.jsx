@@ -11,7 +11,7 @@ function ContactList({ contacts, search ,filtering}) {
     const labelFiltered = filtering
     ? contacts.filter((c) => c.label === filtering)
     : contacts
-  const filteredContacts = labelFiltered.filter((c) => c.name.includes(search));
+  const filteredContacts = labelFiltered.filter((c) => c.name.includes(search.toLowerCase()));
 
 
   const handlePageClick = (pageNumber) => {

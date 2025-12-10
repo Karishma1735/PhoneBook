@@ -11,19 +11,17 @@ const phoneRegex = /^\d{10}$/;
 
 export const phoneBookReducer = (state = initialState, action) => {
     switch (action.type) {
+
         case ADD_CONTACT:
-            console.log("Contact added");
-            const exists = state.contacts.find((c) => c.contact === action.payload.contact);
-            if (exists) {
-                alert("Contact already exists");
-            } else if (!phoneRegex.test(action.payload.contact)) {
-                alert("Please enter a valid phone number");
-            } else {
-                return {
-                    ...state,
-                    contacts: [...state.contacts, action.payload],
-                };
-            }
+    const exists = state.contacts.find(c => c.contact === action.payload.contact);
+    if (exists || !phoneRegex.test(action.payload.contact)) {
+        return state;
+    }
+    return {
+        ...state,
+        contacts: [...state.contacts, action.payload],
+    };
+
             break;
 
         case DELETE_CONTACT:
@@ -39,30 +37,44 @@ export const phoneBookReducer = (state = initialState, action) => {
                 editingcontact: action.payload,
             };
 
+        // case UPDATE_CONTACT:
+        //     const updatedContact = action.payload;
+        //     console.log("Updating", updatedContact);
+
+        //     if (!phoneRegex.test(updatedContact.contact)) {
+        //         alert("Please enter a valid phone number");
+        //         console.log(updatedContact.contact);
+        //         return state;
+        //     }
+
+        //     console.log("Valid phone number, updating contact...");
+        //     return {
+        //         ...state,
+        //         contacts: state.contacts.map((c) =>
+        //             c.id === updatedContact.id ? { ...c, ...updatedContact } : c
+        //         ),
+        //         editingcontact: null,
+        //     };
+
+
         case UPDATE_CONTACT:
-            const updatedContact = action.payload;
-            console.log("Updating", updatedContact);
-
-            if (!phoneRegex.test(updatedContact.contact)) {
-                alert("Please enter a valid phone number");
-                console.log(updatedContact.contact);
-                return state;
-            }
-
-            console.log("Valid phone number, updating contact...");
-            return {
-                ...state,
-                contacts: state.contacts.map((c) =>
-                    c.id === updatedContact.id ? { ...c, ...updatedContact } : c
-                ),
-                editingcontact: null,
-            };
+    const updated = action.payload;
+    if (!phoneRegex.test(updated.contact)) {
+        return state; 
+    }
+    return {
+        ...state,
+        contacts: state.contacts.map(c =>
+            c.id === updated.id ? { ...c, ...updated } : c
+        ),
+        editingcontact: null,
+    };
 
         case SEARCH_USER:
             console.log("Search users triggered");
             return {
                 ...state,
-                search: action.payload,
+                search: action.payload.toLowerCase(),
             };
 
         case FILTER_LABEL:
