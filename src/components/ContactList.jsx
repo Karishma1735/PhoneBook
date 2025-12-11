@@ -1,98 +1,78 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { connect } from "react-redux";
 import ContactItem from "./ContactItem";
 import { Box, Button, Typography } from "@mui/material";
-import { useMemo } from 'react';
-import { fetchContacts } from '../redux/actions';
+import { fetchContactsPage } from "../redux/actions";
 
-function ContactList({ contacts, search, filtering, fetchContacts }) {
-  
+function ContactList({ contacts, search, filtering, totalPages, fetchContactsPage }) {
   const [currentPage, setCurrentPage] = useState(1);
-  const contactPerPage = 5;
 
-  const validContacts = Array.isArray(contacts) ? contacts : [];
-  const labelFiltered = filtering
-    ? validContacts.filter((c) => c.label === filtering)
-    : validContacts;
-
-  const filteredContacts = labelFiltered.filter((c) => c.name.toLowerCase().includes(search.toLowerCase()));
-
-  const handlePageClick = (pageNumber) => {
-    setCurrentPage(pageNumber);
-  };
-
-  const sortedContacts = useMemo(() => {
-
-    const sorted = [...filteredContacts].sort((a, b) => {
-      if (a.bookmarked !== b.bookmarked) {
-        return a.bookmarked ? -1 : 1;
-      }
-      const nameComparison = a.name.localeCompare(b.name);
-      if (nameComparison !== 0) return nameComparison;
-      const updatedAtComparison = new Date(b.updatedAt) - new Date(a.updatedAt); 
-      if (updatedAtComparison !== 0) return updatedAtComparison;
-
-      return 0;
-    });
-    return sorted;
-  }, [filteredContacts]);
-
-  const lastIndex = contactPerPage * currentPage;
-  const firstIndex = lastIndex - contactPerPage;
-  const currentContacts = sortedContacts.slice(firstIndex, lastIndex);
-  const totalPages = Math.ceil(sortedContacts.length / contactPerPage);
   useEffect(() => {
-    fetchContacts();
-  }, [fetchContacts]);
-  useEffect(() => {
-  console.log("Redux contacts =>", contacts);
-}, [contacts]);
+    fetchContactsPage(currentPage, 5); 
+  }, [fetchContactsPage, currentPage]);
 
+  
+  const filteredContacts = useMemo(() => {
+    let validContacts = Array.isArray(contacts) ? contacts : [];
+    if (filtering) validContacts = validContacts.filter(c => c.label === filtering);
+    if (search) validContacts = validContacts.filter(c => c.name.toLowerCase().includes(search.toLowerCase()));
+    return validContacts;
+  }, [contacts, search, filtering]);
+
+const sortedContacts = useMemo(() => {
+  return [...filteredContacts].sort((a, b) => {
+    const aBookmarked = a.bookmarked || false;
+    const bBookmarked = b.bookmarked || false;
+    if (aBookmarked !== bBookmarked) return aBookmarked ? -1 : 1;
+    const nameComparison = a.name.localeCompare(b.name);
+    if (nameComparison !== 0) return nameComparison;
+
+    const aUpdatedAt = a.updatedAt || new Date().toISOString();
+    const bUpdatedAt = b.updatedAt || new Date().toISOString();
+    return new Date(bUpdatedAt) - new Date(aUpdatedAt);
+  });
+}, [filteredContacts]);
+
+
+  const handlePageClick = page => setCurrentPage(page);
 
   return (
     <Box>
       <Typography sx={{ mt: 2, color: "grey", ml: 2 }}>
-        Contacts ({validContacts.length})
+        Contacts ({contacts.length})
       </Typography>
-      
-      {currentContacts.length === 0 ? (
+
+      {sortedContacts.length === 0 ? (
         <p>No contacts found.</p>
       ) : (
-        currentContacts.map((c) => <ContactItem key={c._id} contact={c} />)
+        sortedContacts.map(c => <ContactItem key={c._id} contact={c} />)
       )}
 
-      <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", margin: 2 }}>
-        <Box sx={{ display: "flex", gap: 1 }}>
-          {Array.from({ length: totalPages }, (_, index) => {
-            const pageNumber = index + 1;
-            return (
-              <Button
-                key={pageNumber}
-                onClick={() => handlePageClick(pageNumber)}
-                variant={pageNumber === currentPage ? "contained" : "outlined"}
-                sx={{
-                  fontWeight: "bold",
-                  color: pageNumber === currentPage ? "white" : "black",
-                }}
-              >
-                {pageNumber}
-              </Button>
-            );
-          })}
-        </Box>
+      <Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
+        {Array.from({ length: totalPages }, (_, i) => {
+          const page = i + 1;
+          return (
+            <Button
+              key={page}
+              onClick={() => handlePageClick(page)}
+              variant={page === currentPage ? "contained" : "outlined"}
+            >
+              {page}
+            </Button>
+          );
+        })}
       </Box>
     </Box>
   );
 }
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = state => ({
   contacts: state.contactsData.contacts,
+  totalPages: state.contactsData.totalPages,
   search: state.contactsData.search,
   filtering: state.contactsData.filtering,
 });
 
-const mapDispatchToProps = {
-  fetchContacts,
-};
+const mapDispatchToProps = { fetchContactsPage };
 
 export default connect(mapStateToProps, mapDispatchToProps)(ContactList);

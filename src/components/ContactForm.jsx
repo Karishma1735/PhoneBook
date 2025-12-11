@@ -2,19 +2,20 @@ import { Box, TextField, Select, MenuItem, Button, Typography, Snackbar, Alert }
 import React, { useState } from 'react';
 import { addcontacts } from '../redux/actions';
 import { connect } from 'react-redux';
-import ImageUploader from '../utils/Imageuploader';
 import CloseIcon from '@mui/icons-material/Close';
 
 function ContactForm({ addcontacts, editingcontact, handleClose,contacts }) {
   const [form, setForm] = useState({
     name: "",
     contact: "",
-    address: "",
+    adress: "",
     label: "",
     image: "",
   });
 
   const [showAlert, setShowAlert] = useState(false);
+  const [selectedFile, setSelectedFile] = useState(null);
+
 
 const [error, setError] = useState("");
   const handleChange = (e) => {
@@ -24,52 +25,27 @@ const [error, setError] = useState("");
     });
   };
 
-
-  // const handleSubmit = () => {
-  //   if (!form.name || !form.contact) {
-  //     setShowAlert(true);
-  //     return;
-  //   }
-  //    if (!/^\d{10}$/.test(form.contact)) {
-  //   setError("Phone number must be 10 digits");
-  //   setShowAlert(true);
-  //   return;
-  // }
-
-  //   const contactExists = contacts.find(
-  //   (c) => c.contact === form.contact
-  // );
-
-  // if (contactExists) {
-  //   setError("Contact already exists");
-  //   setShowAlert(true);
-  //   return;
-  // }
-
-  //   addcontacts({
-  //     id: Date.now(),
-  //     bookmarked: false,
-  //     ...form,
-  //   });
-  //   handleClose();
-  //   setForm({ name: "", contact: "", address: "", label: "", image: "" });
-  // };
 const handleSubmit = () => {
   if (!form.name || !form.contact) {
     setShowAlert(true);
+    setError("Name and Contact are required!");
     return;
   }
 
-  addcontacts({
-    name: form.name,
-    contact: form.contact,
-    label: form.label,
-    image: form.image,
-  });
-console.log();
+  const formData = new FormData();
+  formData.append("name", form.name);
+  formData.append("contact", form.contact);
+  formData.append("adress", form.adress);
+  formData.append("label", form.label || "");
+  if (selectedFile) {
+    formData.append("image", selectedFile);
+  }
+
+  addcontacts(formData);
 
   handleClose();
-  setForm({ name: "", contact: "", address: "", label: "", image: "" });
+  setForm({ name: "", contact: "", adress: "", label: "", image: "" });
+  setSelectedFile(null);
 };
 
   return (
@@ -125,10 +101,10 @@ console.log();
       />
 
       <TextField
-        name="address"
+        name="adress"
         label="Address"
         variant="outlined"
-        value={form.address}
+        value={form.adress}
         onChange={handleChange}
         sx={{ marginBottom: 2, width: '100%' }}
       />
@@ -150,10 +126,28 @@ console.log();
         <MenuItem value="Friend">Friend</MenuItem>
         <MenuItem value="Family">Family</MenuItem>
       </Select>
-      <ImageUploader
-        onUpload={(imgData) => setForm({ ...form, image: imgData.imageUrl, imagePublicId: imgData.imagePublicId })}
-        sx={{ marginBottom: 2 }}
-      />
+      <Box sx={{ position: "relative", display: "inline-block", mb: 2 }}>
+  <Button
+    variant="outlined"
+    component="label"
+    sx={{ width: "100%" }}
+  >
+    Upload Image
+    <input
+      type="file"
+      accept="image/*"
+      hidden
+      onChange={(e) => {
+        const file = e.target.files[0];
+        if (file) setSelectedFile(file);
+      }}
+    />
+  </Button>
+  {selectedFile && (
+    <Typography sx={{ mt: 1 }}>{selectedFile.name}</Typography>
+  )}
+</Box>
+
  <Snackbar
   open={showAlert}
   autoHideDuration={3000}

@@ -6,12 +6,11 @@ import BookmarkIcon from '@mui/icons-material/Bookmark';
 import ModeEditIcon from '@mui/icons-material/ModeEdit';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import BookmarkBorderIcon from '@mui/icons-material/BookmarkBorder';
-import axios from 'axios';
-import ImageUploader from '../utils/Imageuploader';
+
 
 const phoneRegex = /^[+]?[0-9]{10,15}$/;
 
-function ContactItem({ contact, deleteContact, updateContact, toggleBookmark }) {
+function ContactItem({ contact, deleteContact, updateContact,toggleBookmark}) {
   const [open, setOpen] = useState(false);
   
   const [viewOpen, setViewOpen] = useState(false);
@@ -23,6 +22,8 @@ function ContactItem({ contact, deleteContact, updateContact, toggleBookmark }) 
     label: contact.label,
     image: contact.image || '',
   });
+  const [selectedFile, setSelectedFile] = useState(null);
+
   const [snackbarOpen, setSnackbarOpen] = useState(false);
 const [snackbarMessage, setSnackbarMessage] = useState('');
 
@@ -44,22 +45,42 @@ const [snackbarMessage, setSnackbarMessage] = useState('');
   }
         setConfirmationModalOpen(true);
   };
-const handleConfirmSave = (e) => {
-  e.stopPropagation()
-    updateContact({ ...editForm, _id: contact._id });
-    setOpen(false);
-    setConfirmationModalOpen(false); 
-  };
+// const handleConfirmSave = (e) => {
+//   e.stopPropagation()
+//     updateContact({ ...editForm, _id: contact._id });
+//     setOpen(false);
+//     setConfirmationModalOpen(false); 
+//   };
+const handleConfirmSave = async (e) => {
+  e.stopPropagation();
+
+  const formData = new FormData();
+  formData.append("name", editForm.name);
+  formData.append("contact", editForm.contact);
+  formData.append("adress", editForm.adress);
+  formData.append("label", editForm.label);
+
+  if (selectedFile) {
+    formData.append("image", selectedFile);
+  } else if (!editForm.image) {
+    formData.append("image", "");
+  }
+
+  updateContact(formData, contact._id);
+  setOpen(false);
+  setConfirmationModalOpen(false);
+};
 
   const handleCancelSave = (e) => {
     e.stopPropagation()
     setConfirmationModalOpen(false);
     setOpen(false)
   };
-  const handleBookmark = (e) => {
-    e.stopPropagation();
-    toggleBookmark(contact.id);
-  };
+ const handleBookmark = (e) => {
+  e.stopPropagation();
+    updateContact(null, contact._id, true);
+};
+
 
   const handleOpen = (e) => {
     e.stopPropagation();
@@ -83,7 +104,8 @@ const handleConfirmSave = (e) => {
     setDeleteOpen(false);
   };
 
-  const handleDeleteConfirm = () => {
+  const handleDeleteConfirm = (e) => {
+    e.stopPropagation()
     deleteContact(contact._id);
     setDeleteOpen(false);
   };
@@ -91,7 +113,7 @@ const handleConfirmSave = (e) => {
   return (
     <Box
       sx={{
-        display: 'flex',
+        display: 'flex',  
         alignItems: 'center',
         // gap:10,
         boxShadow: 1,
@@ -146,7 +168,9 @@ const handleConfirmSave = (e) => {
             <DeleteOutlineIcon color='error' />
           </Tooltip>
         </Button>
-        <Button onClick={handleBookmark}>
+        <Button   onClick={(e) => {
+          e.stopPropagation(),
+          toggleBookmark(contact._id, contact.bookmarked)}}>
           <Tooltip
             title='Bookmark'
             componentsProps={{
@@ -160,10 +184,10 @@ const handleConfirmSave = (e) => {
             }}
           >
             {contact.bookmarked ? (
-              <BookmarkIcon sx={{ color: '#FFDB58' }} />
-            ) : (
-              <BookmarkBorderIcon sx={{ color: '#000000' }} />
-            )}
+      <BookmarkIcon sx={{ color: '#FFDB58' }} />
+    ) : (
+      <BookmarkBorderIcon sx={{ color: '#000000' }} />
+    )}
           </Tooltip>
         </Button>
       </Box>
@@ -205,40 +229,38 @@ const handleConfirmSave = (e) => {
           <Typography variant='h6' sx={{ mb: 2 }}>
             Edit Contact
           </Typography>
+<Box sx={{ position: "relative", display: "inline-block", mb: 2 }}>
+  <Avatar
+    src={selectedFile ? URL.createObjectURL(selectedFile) : editForm.image}
+    alt="Preview"
+    sx={{ width: 80, height: 80 }}
+  />
 
-         <Box sx={{ position: 'relative', display: 'inline-block' }}>
-  {editForm.image && (
-    <Avatar 
-      src={editForm.image} 
-      alt="Preview" 
-      sx={{ width: 80, height: 80, mb: 2 }}
-    />
-  )}
-
-  <Button 
-    variant="outlined" 
-    component="label" 
+  <Button
+    variant="outlined"
+    component="label"
     sx={{
-      position: 'absolute',
+      position: "absolute",
       top: 0,
       right: 0,
-      backgroundColor: 'rgba(0, 0, 0, 0.5)',
-      borderRadius: '50%',
-      color: 'white',
-      padding: '3px',
-      zIndex: 1,
-      minWidth: 'unset',
-      height: 'auto',
-      width: 'auto', 
-      display: 'flex', 
-      justifyContent: 'center',
-      alignItems: 'center',
+      backgroundColor: "rgba(0,0,0,0.6)",
+      borderRadius: "50%",
+      color: "white",
+      padding: "4px",
+      minWidth: 0,
     }}
   >
-    <ModeEditIcon sx={{ fontSize: 24 }} />
-    <Box sx={{ display: 'none' }}>
-  <ImageUploader onUpload={handleImageUpload} />
-</Box>
+    <ModeEditIcon sx={{ fontSize: 22 }} />
+
+    <input
+      type="file"
+      accept="image/*"
+      hidden
+      onChange={(e) => {
+        const file = e.target.files[0];
+        if (file) setSelectedFile(file);
+      }}
+    />
   </Button>
 </Box>
 
@@ -395,6 +417,9 @@ const handleConfirmSave = (e) => {
     </Box>
   );
 }
+const mapStateToProps = (state, ownProps) => ({
+  contact: state.contactsData.contacts.find(c => c._id === ownProps.contact._id)
+})
 
 const mapDispatchToProps = {
   deleteContact,
@@ -402,4 +427,4 @@ const mapDispatchToProps = {
   toggleBookmark,
 };
 
-export default connect(null, mapDispatchToProps)(ContactItem);
+export default connect(mapStateToProps, mapDispatchToProps)(ContactItem);

@@ -1,10 +1,13 @@
-import { ADD_CONTACT, DELETE_CONTACT, EDIT_CONTACT, FETCH_CONTACT, FILTER_LABEL, SEARCH_USER, TOGGLE_BOOKMARK, UPDATE_CONTACT } from "./actionTypes";
+import { ADD_CONTACT, DELETE_CONTACT, EDIT_CONTACT, FETCH_CONTACT, FETCH_PAGES, FILTER_LABEL, SEARCH_USER, TOGGLE_BOOKMARK, UPDATE_CONTACT } from "./actionTypes";
 
 const initialState = {
     contacts: [],
     editingcontact: null,
     search: "",
     filtering: "",
+     currentPage: 1,
+  totalPages: 1,
+  totalCount: 0,
 };
 
 const phoneRegex = /^\d{10}$/;
@@ -12,15 +15,20 @@ const phoneRegex = /^\d{10}$/;
 export const phoneBookReducer = (state = initialState, action) => {
     switch (action.type) {
 
-        case ADD_CONTACT:
+   case ADD_CONTACT:
     const exists = state.contacts.find(c => c.contact === action.payload.contact);
     if (exists || !phoneRegex.test(action.payload.contact)) {
         return state;
     }
     return {
         ...state,
-        contacts: [...state.contacts, action.payload],
+        contacts: [...state.contacts, { 
+            ...action.payload,
+            bookmarked: action.payload.bookmarked || false,
+            updatedAt: new Date().toISOString()
+        }],
     };
+
 
             break;
                 case FETCH_CONTACT:
@@ -42,19 +50,28 @@ export const phoneBookReducer = (state = initialState, action) => {
                 editingcontact: action.payload,
             };
 
-        case UPDATE_CONTACT:
-              console.log('Updated Contact:', action.payload);
+    case UPDATE_CONTACT:
+    console.log("UPDATE_CONTACT reducer hit", action.payload);
     const updated = action.payload;
-    if (!phoneRegex.test(updated.contact)) {
-        return state; 
-    }
+
     return {
         ...state,
         contacts: state.contacts.map(c =>
-            c._id === updated._id ? { ...c, ...updated } : c
+            c._id === updated._id 
+                ? { 
+                    ...c, 
+                    ...updated,
+                    bookmarked: 
+                      updated.bookmarked !== undefined 
+                        ? updated.bookmarked 
+                        : c.bookmarked,
+                    updatedAt: updated.updatedAt || new Date().toISOString()
+                } 
+                : c
         ),
         editingcontact: null,
     };
+
 
         case SEARCH_USER:
             console.log("Search users triggered");
@@ -70,14 +87,27 @@ export const phoneBookReducer = (state = initialState, action) => {
                 filtering: action.payload,
             };
 
-        case TOGGLE_BOOKMARK:
-            console.log("Bookmark toggled");
-            return {
-                ...state,
-                contacts: state.contacts.map((c) =>
-                    c.id === action.payload ? { ...c, bookmarked: !c.bookmarked } : c
-                ),
-            };
+   case TOGGLE_BOOKMARK:
+  return {
+    ...state,
+    contacts: state.contacts.map((c) =>
+      c._id === action.payload
+        ? { 
+            ...c, 
+            bookmarked: !c.bookmarked, 
+            updatedAt: new Date().toISOString() 
+          }
+        : c
+    ),
+  };
+   case FETCH_PAGES:
+      return {
+        ...state,
+        contacts: action.payload.contacts,
+        currentPage: action.payload.currentPage,
+        totalPages: action.payload.totalPages,
+        totalCount: action.payload.totalCount,
+      };
 
         default:
             return state;
