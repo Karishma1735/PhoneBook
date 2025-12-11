@@ -19,19 +19,19 @@ function ContactList({ contacts, search, filtering, totalPages, fetchContactsPag
     return validContacts;
   }, [contacts, search, filtering]);
 
-const sortedContacts = useMemo(() => {
-  return [...filteredContacts].sort((a, b) => {
-    const aBookmarked = a.bookmarked || false;
-    const bBookmarked = b.bookmarked || false;
-    if (aBookmarked !== bBookmarked) return aBookmarked ? -1 : 1;
-    const nameComparison = a.name.localeCompare(b.name);
-    if (nameComparison !== 0) return nameComparison;
+// const sortedContacts = useMemo(() => {
+//   return [...filteredContacts].sort((a, b) => {
+//     const aBookmarked = a.bookmarked || false;
+//     const bBookmarked = b.bookmarked || false;
+//     if (aBookmarked !== bBookmarked) return aBookmarked ? -1 : 1;
+//     const nameComparison = a.name.localeCompare(b.name);
+//     if (nameComparison !== 0) return nameComparison;
 
-    const aUpdatedAt = a.updatedAt || new Date().toISOString();
-    const bUpdatedAt = b.updatedAt || new Date().toISOString();
-    return new Date(bUpdatedAt) - new Date(aUpdatedAt);
-  });
-}, [filteredContacts]);
+//     const aUpdatedAt = a.updatedAt || new Date().toISOString();
+//     const bUpdatedAt = b.updatedAt || new Date().toISOString();
+//     return new Date(bUpdatedAt) - new Date(aUpdatedAt);
+//   });
+// }, [filteredContacts]);
 
 
   const handlePageClick = page => setCurrentPage(page);
@@ -42,10 +42,10 @@ const sortedContacts = useMemo(() => {
         Contacts ({contacts.length})
       </Typography>
 
-      {sortedContacts.length === 0 ? (
+      {filteredContacts.length === 0 ? (
         <p>No contacts found.</p>
       ) : (
-        sortedContacts.map(c => <ContactItem key={c._id} contact={c} />)
+        filteredContacts.map(c => <ContactItem key={c._id} contact={c} />)
       )}
 
       <Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>

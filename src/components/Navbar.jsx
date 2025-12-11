@@ -1,22 +1,17 @@
-import React, { useState } from "react";
-import {
-  AppBar,
-  Toolbar,
-  Typography,
-  Button,
-  Modal,
-  Box,
-  TextField,
-  InputAdornment,
-  IconButton,
-  InputLabel,
-  Select,
-  MenuItem
-} from "@mui/material";
+import React, { useState, useCallback } from "react";
+import { AppBar, Toolbar, Typography, Button, Modal, Box, TextField, InputAdornment, IconButton, Select, MenuItem } from "@mui/material";
 import SearchIcon from '@mui/icons-material/Search';
 import ContactForm from "../components/ContactForm";
 import { filterByLabel, searchuser } from "../redux/actions";
 import { connect } from "react-redux";
+
+const debounce = (func, delay) => {
+  let timeoutId;
+  return (...args) => {
+    clearTimeout(timeoutId);
+    timeoutId = setTimeout(() => func(...args), delay);
+  };
+};
 
 const style = {
   position: "absolute",
@@ -33,11 +28,24 @@ const style = {
 function Navbar({ searchuser, filterByLabel }) {
   const [open, setOpen] = useState(false);
   const [selectedLabel, setSelectedLabel] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const handleSearch = useCallback(
+    debounce((value) => {
+      searchuser(value);
+    }, 1000),
+    []
+  );
+  const handleInputChange = (e) => {
+    const value = e.target.value;
+    setSearchQuery(value);
+    handleSearch(value);
+  };
 
   const handleSelectChange = (e) => {
     const value = e.target.value;
     setSelectedLabel(value);
-    filterByLabel(value); 
+    filterByLabel(value);
   };
 
   return (
@@ -47,7 +55,8 @@ function Navbar({ searchuser, filterByLabel }) {
           <Typography variant="h6">Phonebook</Typography>
           <TextField
             label="Search"
-            onChange={(e) => searchuser(e.target.value)}
+            value={searchQuery}
+            onChange={handleInputChange}
             InputProps={{
               endAdornment: (
                 <InputAdornment position="end">
@@ -69,16 +78,15 @@ function Navbar({ searchuser, filterByLabel }) {
             displayEmpty
             onChange={handleSelectChange}
             renderValue={(selected) => {
-              if (selected === "") return "All"; 
+              if (selected === "") return "All";
               return selected;
             }}
-      
             sx={{
               backgroundColor: '#FFF',
               borderRadius: '8px',
               fontSize: '16px',
               width: "100px",
-              padding:'0'
+              padding: '0',
             }}
           >
             <MenuItem value="">All</MenuItem>
@@ -112,3 +120,4 @@ const mapDispatchToProps = {
 };
 
 export default connect(null, mapDispatchToProps)(Navbar);
+
