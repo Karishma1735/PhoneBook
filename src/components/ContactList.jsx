@@ -9,7 +9,7 @@ function ContactList({ contacts, search, filtering, totalPages, fetchContactsPag
 
   useEffect(() => {
     fetchContactsPage(currentPage, 5); 
-  }, [fetchContactsPage, currentPage]);
+  }, [fetchContactsPage,currentPage]);
 
   
   const filteredContacts = useMemo(() => {
@@ -18,21 +18,6 @@ function ContactList({ contacts, search, filtering, totalPages, fetchContactsPag
     if (search) validContacts = validContacts.filter(c => c.name.toLowerCase().includes(search.toLowerCase()));
     return validContacts;
   }, [contacts, search, filtering]);
-
-// const sortedContacts = useMemo(() => {
-//   return [...filteredContacts].sort((a, b) => {
-//     const aBookmarked = a.bookmarked || false;
-//     const bBookmarked = b.bookmarked || false;
-//     if (aBookmarked !== bBookmarked) return aBookmarked ? -1 : 1;
-//     const nameComparison = a.name.localeCompare(b.name);
-//     if (nameComparison !== 0) return nameComparison;
-
-//     const aUpdatedAt = a.updatedAt || new Date().toISOString();
-//     const bUpdatedAt = b.updatedAt || new Date().toISOString();
-//     return new Date(bUpdatedAt) - new Date(aUpdatedAt);
-//   });
-// }, [filteredContacts]);
-
 
   const handlePageClick = page => setCurrentPage(page);
 

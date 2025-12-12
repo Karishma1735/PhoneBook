@@ -417,9 +417,6 @@ const handleConfirmSave = async (e) => {
     </Box>
   );
 }
-const mapStateToProps = (state, ownProps) => ({
-  contact: state.contactsData.contacts.find(c => c._id === ownProps.contact._id)
-})
 
 const mapDispatchToProps = {
   deleteContact,
@@ -427,4 +424,4 @@ const mapDispatchToProps = {
   toggleBookmark,
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(ContactItem);
+export default connect(null, mapDispatchToProps)(ContactItem);

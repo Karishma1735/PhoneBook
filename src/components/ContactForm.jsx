@@ -15,8 +15,6 @@ function ContactForm({ addcontacts, editingcontact, handleClose,contacts }) {
 
   const [showAlert, setShowAlert] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
-
-
 const [error, setError] = useState("");
   const handleChange = (e) => {
     setForm({
