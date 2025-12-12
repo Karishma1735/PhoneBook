@@ -51,7 +51,7 @@ function Navbar({ searchuser, filterByLabel }) {
   return (
     <>
       <AppBar position="static">
-        <Toolbar sx={{ display: "flex", justifyContent: "space-between", px: 2 }}>
+        <Toolbar sx={{ display: "flex", justifyContent: "space-between", px: 2 ,bgcolor:"#1E2A56"}}>
           <Typography variant="h6">Phonebook</Typography>
           <TextField
             label="Search"
@@ -97,7 +97,8 @@ function Navbar({ searchuser, filterByLabel }) {
 
           <Button
             variant="contained"
-            color="secondary"
+            bgcolor="#8ecae6"
+            // color="secondary"
             onClick={() => setOpen(true)}
           >
             Create Contact

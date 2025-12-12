@@ -8,8 +8,8 @@ function ContactList({ contacts, search, filtering, totalPages, fetchContactsPag
   const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
-    fetchContactsPage(currentPage, 5); 
-  }, [fetchContactsPage,currentPage]);
+    fetchContactsPage(currentPage, 5,search, filtering); 
+  }, [fetchContactsPage,currentPage, search, filtering]);
 
   
   const filteredContacts = useMemo(() => {
@@ -28,12 +28,14 @@ function ContactList({ contacts, search, filtering, totalPages, fetchContactsPag
       </Typography>
 
       {filteredContacts.length === 0 ? (
-        <p>No contacts found.</p>
+       <Typography variant="h5" align="center" sx={{ mt: 4, color: "black" ,fontSize:"5rem"}}>
+    No contacts found.
+  </Typography>
       ) : (
         filteredContacts.map(c => <ContactItem key={c._id} contact={c} />)
       )}
 
-      <Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
+      <Box sx={{ display: "flex", justifyContent: "center", mt: 2 ,gap:2}}>
         {Array.from({ length: totalPages }, (_, i) => {
           const page = i + 1;
           return (

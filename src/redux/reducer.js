@@ -50,28 +50,6 @@ return {
 ...state,
 editingcontact: action.payload,
 };
-
-// case UPDATE_CONTACT:
-// console.log("UPDATE_CONTACT reducer hit", action.payload);
-// const updated = action.payload;
-
-// return {
-// ...state,
-// contacts: state.contacts.map(c =>
-// c._id === updated._id
-// ? {
-// ...c,
-// ...updated,
-// bookmarked:
-// updated.bookmarked !== undefined
-// ? updated.bookmarked
-// : c.bookmarked,
-// updatedAt: updated.updatedAt || new Date().toISOString()
-// }
-// : c
-// ),
-// editingcontact: null,
-// };
 case UPDATE_CONTACT: {
   const updated = action.payload;
 

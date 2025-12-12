@@ -23,7 +23,7 @@ const [error, setError] = useState("");
     });
   };
 
-const handleSubmit = () => {
+const handleSubmit = async() => {
   if (!form.name || !form.contact) {
     setShowAlert(true);
     setError("Name and Contact are required!");
@@ -38,12 +38,19 @@ const handleSubmit = () => {
   if (selectedFile) {
     formData.append("image", selectedFile);
   }
+  try {
+    await addcontacts(formData); 
+    handleClose();
+    setForm({ name: "", contact: "", adress: "", label: "", image: "" });
+    setSelectedFile(null);
 
-  addcontacts(formData);
-
-  handleClose();
-  setForm({ name: "", contact: "", adress: "", label: "", image: "" });
-  setSelectedFile(null);
+  } catch (err) {
+  const msgs = err?.response?.data?.messages;
+  console.log(err?.response?.data);
+  
+  setError(msgs ? msgs.join("\n") : "Something went wrong!");
+  setShowAlert(true);
+}
 };
 
   return (

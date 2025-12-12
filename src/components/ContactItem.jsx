@@ -6,13 +6,14 @@ import BookmarkIcon from '@mui/icons-material/Bookmark';
 import ModeEditIcon from '@mui/icons-material/ModeEdit';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import BookmarkBorderIcon from '@mui/icons-material/BookmarkBorder';
+import CloseIcon from '@mui/icons-material/Close';
 
 
 const phoneRegex = /^[+]?[0-9]{10,15}$/;
 
-function ContactItem({ contact, deleteContact, updateContact,toggleBookmark}) {
+function ContactItem({ contact, deleteContact, updateContact, toggleBookmark }) {
   const [open, setOpen] = useState(false);
-  
+
   const [viewOpen, setViewOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [editForm, setEditForm] = useState({
@@ -25,66 +26,75 @@ function ContactItem({ contact, deleteContact, updateContact,toggleBookmark}) {
   const [selectedFile, setSelectedFile] = useState(null);
 
   const [snackbarOpen, setSnackbarOpen] = useState(false);
-const [snackbarMessage, setSnackbarMessage] = useState('');
+  const [snackbarMessage, setSnackbarMessage] = useState('');
 
-   const [confirmationModalOpen, setConfirmationModalOpen] = useState(false);
-   const handleImageUpload = ({ imageUrl, imagePublicId }) => {
+  const [confirmationModalOpen, setConfirmationModalOpen] = useState(false);
+  const handleImageUpload = ({ imageUrl, imagePublicId }) => {
     setEditForm({ ...editForm, image: imageUrl });
   };
- 
+
 
   const handleChange = (e) => {
     setEditForm({ ...editForm, [e.target.name]: e.target.value });
   };
 
   const handleSave = () => {
-   if (!phoneRegex.test(editForm.contact)) {
-    setSnackbarMessage('Please enter a valid phone number');
-    setSnackbarOpen(true);
-    return;
-  }
-        setConfirmationModalOpen(true);
+    if (!phoneRegex.test(editForm.contact)) {
+      setSnackbarMessage('Please enter a valid phone number of 10 digits');
+      setSnackbarOpen(true);
+      return;
+    }
+    setConfirmationModalOpen(true);
   };
-// const handleConfirmSave = (e) => {
-//   e.stopPropagation()
-//     updateContact({ ...editForm, _id: contact._id });
-//     setOpen(false);
-//     setConfirmationModalOpen(false); 
-//   };
-const handleConfirmSave = async (e) => {
-  e.stopPropagation();
+  // const handleConfirmSave = (e) => {
+  //   e.stopPropagation()
+  //     updateContact({ ...editForm, _id: contact._id });
+  //     setOpen(false);
+  //     setConfirmationModalOpen(false); 
+  //   };
+  const handleConfirmSave = async (e) => {
+    e.stopPropagation();
 
-  const formData = new FormData();
-  formData.append("name", editForm.name);
-  formData.append("contact", editForm.contact);
-  formData.append("adress", editForm.adress);
-  formData.append("label", editForm.label);
+    const formData = new FormData();
+    formData.append("name", editForm.name);
+    formData.append("contact", editForm.contact);
+    formData.append("adress", editForm.adress);
+    formData.append("label", editForm.label);
 
-  if (selectedFile) {
-    formData.append("image", selectedFile);
-  } else if (!editForm.image) {
-    formData.append("image", "");
-  }
+    if (selectedFile) {
+      formData.append("image", selectedFile);
+    } else if (!editForm.image) {
+      formData.append("image", "");
+    }
 
-  updateContact(formData, contact._id);
-  setOpen(false);
-  setConfirmationModalOpen(false);
-};
+    try {
+      await updateContact(formData, contact._id);
+      setOpen(false);
+      setConfirmationModalOpen(false);
+      setSnackbarOpen(false);
+    } catch (error) {
+      setSnackbarMessage(error?.response?.data?.error || 'Error updating contact');
+      console.log(error?.response?.data?.error);
+      setConfirmationModalOpen(false);
+      setSnackbarOpen(true);
+
+    }
+  };
 
   const handleCancelSave = (e) => {
     e.stopPropagation()
     setConfirmationModalOpen(false);
     setOpen(false)
   };
- const handleBookmark = (e) => {
-  e.stopPropagation();
+  const handleBookmark = (e) => {
+    e.stopPropagation();
     updateContact(null, contact._id, true);
-};
+  };
 
 
   const handleOpen = (e) => {
     e.stopPropagation();
-      setEditForm({ ...contact });
+    setEditForm({ ...contact });
     setOpen(true);
   };
 
@@ -113,7 +123,7 @@ const handleConfirmSave = async (e) => {
   return (
     <Box
       sx={{
-        display: 'flex',  
+        display: 'flex',
         alignItems: 'center',
         // gap:10,
         boxShadow: 1,
@@ -126,11 +136,11 @@ const handleConfirmSave = async (e) => {
     >
 
 
-      <Avatar src={contact.image} alt={contact.name} sx={{margin:3, width: 56, height: 56 }} />
-      <Typography sx={{ margin: 3,marginLeft:10,width:90}}>{contact.name||"NA"}</Typography>
-      <Typography sx={{ margin: 3 ,width:90}}>{contact.contact||"NA"}</Typography>
-      <Typography sx={{ margin: 3 ,width:90}}>{contact.adress||"NA"}</Typography>
-      <Typography sx={{ margin: 3,width:90 }}>{contact.label||"NA"}</Typography>
+      <Avatar src={contact.image} alt={contact.name} sx={{ margin: 3, width: 56, height: 56 }} />
+      <Typography sx={{ margin: 3, marginLeft: 10, width: 90 }}>{contact.name || "-"}</Typography>
+      <Typography sx={{ margin: 3, width: 90 }}>{contact.contact || "-"}</Typography>
+      <Typography sx={{ margin: 3, width: 90 }}>{contact.adress || "-"}</Typography>
+      <Typography sx={{ margin: 3, width: 90 }}>{contact.label || "-"}</Typography>
 
       <Box sx={{ display: 'flex', gap: 1 }}>
         <Button onClick={handleOpen}>
@@ -168,9 +178,10 @@ const handleConfirmSave = async (e) => {
             <DeleteOutlineIcon color='error' />
           </Tooltip>
         </Button>
-        <Button   onClick={(e) => {
+        <Button onClick={(e) => {
           e.stopPropagation(),
-          toggleBookmark(contact._id, contact.bookmarked)}}>
+            toggleBookmark(contact._id, contact.bookmarked)
+        }}>
           <Tooltip
             title='Bookmark'
             componentsProps={{
@@ -184,15 +195,16 @@ const handleConfirmSave = async (e) => {
             }}
           >
             {contact.bookmarked ? (
-      <BookmarkIcon sx={{ color: '#FFDB58' }} />
-    ) : (
-      <BookmarkBorderIcon sx={{ color: '#000000' }} />
-    )}
+              <BookmarkIcon sx={{ color: '#FFDB58' }} />
+            ) : (
+              <BookmarkBorderIcon sx={{ color: '#000000' }} />
+            )}
           </Tooltip>
         </Button>
       </Box>
 
       <Modal open={open} onClose={() => setOpen(false)}>
+        
         <Box
           sx={{
             width: 400,
@@ -206,63 +218,76 @@ const handleConfirmSave = async (e) => {
           }}
           onClick={handleModalClick}
         >
-                      <Snackbar
-  open={snackbarOpen}
-  autoHideDuration={6000}
-  onClose={(e) => {
-    e.stopPropagation(),
-    setSnackbarOpen(false)}}
-         sx={{
-        position: 'absolute',
-        top:"-25rem",
-        left: '10rem',
-        transform: 'translateX(-50%)',
+             <CloseIcon
+                onClick={() => setOpen(false)}
+                sx={{
+                  position: 'absolute',
+                  top: 10,
+                  right: 10,
+                  cursor: 'pointer',
+                  color: 'gray',
+                }}
+              />
+          <Snackbar
+            open={snackbarOpen}
+            autoHideDuration={500}
+            onClose={(e) => {
+              e.stopPropagation();
+                setSnackbarOpen(false)
+            }}
+            sx={{
+              position: 'absolute',
+              top: "-25rem",
+              left: '10rem',
+              transform: 'translateX(-50%)',
 
-      }}
->
-  <Alert onClose={(e) => {
-    e.stopPropagation()
-    setSnackbarOpen(false)}} severity="error" sx={{ width: '100%' }}>
-    {snackbarMessage}
-  </Alert>
-  </Snackbar>
+            }}
+             anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+          >
+            <Alert onClose={(e) => {
+              e.stopPropagation()
+              setSnackbarOpen(false)
+            }} severity="error" sx={{ width: '100%' }}>
+              {snackbarMessage}
+            </Alert>
+          </Snackbar>
           <Typography variant='h6' sx={{ mb: 2 }}>
             Edit Contact
           </Typography>
-<Box sx={{ position: "relative", display: "inline-block", mb: 2 }}>
-  <Avatar
-    src={selectedFile ? URL.createObjectURL(selectedFile) : editForm.image}
-    alt="Preview"
-    sx={{ width: 80, height: 80 }}
-  />
+          <Box sx={{ position: "relative", display: "inline-block", mb: 2 }}>
+            <Avatar
+              src={selectedFile ? URL.createObjectURL(selectedFile) : editForm.image}
+              alt="Preview"
+              sx={{ width: 80, height: 80 }}
+            />
 
-  <Button
-    variant="outlined"
-    component="label"
-    sx={{
-      position: "absolute",
-      top: 0,
-      right: 0,
-      backgroundColor: "rgba(0,0,0,0.6)",
-      borderRadius: "50%",
-      color: "white",
-      padding: "4px",
-      minWidth: 0,
-    }}
-  >
-    <ModeEditIcon sx={{ fontSize: 22 }} />
+            <Button
+              variant="outlined"
+              component="label"
+              sx={{
+                position: "absolute",
+                top: 0,
+                right: 0,
+                backgroundColor: "rgba(0,0,0,0.6)",
+                borderRadius: "50%",
+                color: "white",
+                padding: "4px",
+                minWidth: 0,
+              }}
+            >
+              <ModeEditIcon sx={{ fontSize: 22 }} />
 
-    <input
-      type="file"
-      accept="image/*"
-      hidden
-      onChange={(e) => {
-        const file = e.target.files[0];
-        if (file) setSelectedFile(file);
-      }}
-    />
-  </Button>
-</Box>
+              <input
+                type="file"
+                accept="image/*"
+                hidden
+                onChange={(e) => {
+                  const file = e.target.files[0];
+                  if (file) setSelectedFile(file);
+                }}
+              />
+            </Button>
+          </Box>
 
 
 
@@ -309,41 +334,41 @@ const handleConfirmSave = async (e) => {
       </Modal>
 
 
-<Modal open={confirmationModalOpen} onClose={handleCancelSave}>
-  <Box
-    sx={{
-      width: 400,
-      bgcolor: 'white',
-      p: 4,
-      borderRadius: 2,
-      position: 'absolute',
-      top: '50%',
-      left: '50%',
-      transform: 'translate(-50%, -50%)',
-    }}
-  >
+      <Modal open={confirmationModalOpen} onClose={handleCancelSave}>
+        <Box
+          sx={{
+            width: 400,
+            bgcolor: 'white',
+            p: 4,
+            borderRadius: 2,
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+          }}
+        >
 
-    <Typography variant="h6" sx={{ mb: 2 }}>
-      Are you sure you want to update this contact?
-    </Typography>
-    <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-      <Button
-        variant="outlined"
-        color="error"
-        onClick={handleCancelSave} 
-      >
-        Cancel
-      </Button>
-      <Button
-        variant="contained"
-        color="primary"
-        onClick={handleConfirmSave} 
-      >
-        Confirm
-      </Button>
-    </Box>
-  </Box>
-</Modal>
+          <Typography variant="h6" sx={{ mb: 2 }}>
+            Are you sure you want to update this contact?
+          </Typography>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+            <Button
+              variant="outlined"
+              color="error"
+              onClick={handleCancelSave}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={handleConfirmSave}
+            >
+              Confirm
+            </Button>
+          </Box>
+        </Box>
+      </Modal>
 
       <Modal open={viewOpen} onClose={handleViewClose}>
         <Box
